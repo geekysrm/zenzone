@@ -37,12 +37,6 @@ export default function ChannelHeader({ channel, topic, participantCount }: Chan
             <span className="text-sm">{participantCount}</span>
           </div>
         )}
-        <MessageSummary 
-          messages={dummyMessages}
-          channelName={channel.name}
-          channelId={channel.id}
-          unreadCount={channel.unreadCount}
-        />
         <button className="flex items-center text-gray-500 hover:text-gray-800 transition-colors">
           <Headphones size={16} />
         </button>
@@ -56,6 +50,13 @@ export default function ChannelHeader({ channel, topic, participantCount }: Chan
             className="bg-gray-100 text-sm rounded-md pl-8 pr-4 py-1.5 w-64 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
+        <MessageSummary 
+          messages={dummyMessages}
+          channelName={channel.name}
+          channelId={channel.id}
+          unreadCount={channel.unreadCount}
+          buttonText="Summarize Recent"
+        />
       </div>
     </div>
   );

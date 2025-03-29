@@ -58,7 +58,10 @@ export default function MessageList({ messages, channelName }: MessageListProps)
               {message.isEvent ? (
                 <EventMessage message={message} />
               ) : (
-                <UserMessage message={message} isCurrentUser={message.user.id === user?.id} />
+                <UserMessage 
+                  message={message} 
+                  isCurrentUser={message.user.id === user?.id} 
+                />
               )}
             </div>
           ))}
@@ -71,9 +74,9 @@ export default function MessageList({ messages, channelName }: MessageListProps)
 function EventMessage({ message }: { message: Message }) {
   if (!message.eventDetails) return null;
   
-  // Get user initials
+  // Get user initials for the sender
   const userInitials = getInitials(message.user.name);
-  // Generate avatar URL using email
+  // Generate avatar URL using the sender's email
   const avatarUrl = `https://i.pravatar.cc/150?u=${message.user.email || message.user.id}`;
   
   return (
@@ -120,10 +123,9 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
   // Format the timestamp properly
   const timestamp = formatTimestamp(message.timestamp);
   
-  // Get user initials
-  const userInitials = getInitials(message.user.name);
-  // Generate avatar URL using email
-  const avatarUrl = `https://i.pravatar.cc/150?u=${message.user.email || message.user.id}`;
+  // Use the sender's information directly from the message object
+  const senderName = message.user.name;
+  const senderAvatar = message.user.avatar || `https://i.pravatar.cc/150?u=${message.user.email || message.user.id}`;
   
   return (
     <div className={cn(
@@ -131,8 +133,8 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
       isCurrentUser ? "flex-row-reverse" : "flex-row"
     )}>
       <img
-        src={message.user.avatar || avatarUrl}
-        alt={message.user.name}
+        src={senderAvatar}
+        alt={senderName}
         className="w-9 h-9 flex-shrink-0 mt-1 rounded-full object-cover"
       />
       
@@ -147,11 +149,11 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
           {isCurrentUser ? (
             <>
               <span className="text-xs text-gray-500">{timestamp}</span>
-              <span className="font-bold text-gray-800">{message.user.name}</span>
+              <span className="font-bold text-gray-800">{senderName}</span>
             </>
           ) : (
             <>
-              <span className="font-bold text-gray-800">{message.user.name}</span>
+              <span className="font-bold text-gray-800">{senderName}</span>
               <span className="text-xs text-gray-500">{timestamp}</span>
             </>
           )}

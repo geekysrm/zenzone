@@ -33,7 +33,13 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
         
         <div className="space-y-4 py-4">
           <div className="min-h-[200px] max-h-[400px] overflow-y-auto border rounded-md p-4 bg-gray-50">
-            {summary ? summary : "Click 'Generate Summary' to create a summary of unread messages."}
+            {summary ? (
+              <div className="prose prose-sm max-w-none">
+                {summary}
+              </div>
+            ) : (
+              "Click 'Generate Summary' to create a summary of unread messages."
+            )}
           </div>
           <div className="flex justify-end">
             <Button onClick={handleGenerateSummary}>

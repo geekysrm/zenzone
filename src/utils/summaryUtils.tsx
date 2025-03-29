@@ -15,6 +15,35 @@ export type MessageForSummary = {
   timestamp: string;
 }
 
+// Helper function to render Markdown
+function renderMarkdown(text: string): string {
+  // Bold
+  let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  // Italic
+  formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  
+  // Code
+  formatted = formatted.replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 rounded">$1</code>');
+  
+  // Headers
+  formatted = formatted.replace(/^### (.*?)$/gm, '<h3 class="text-lg font-semibold">$1</h3>');
+  formatted = formatted.replace(/^## (.*?)$/gm, '<h2 class="text-xl font-semibold">$1</h2>');
+  formatted = formatted.replace(/^# (.*?)$/gm, '<h1 class="text-2xl font-semibold">$1</h1>');
+  
+  // Lists
+  formatted = formatted.replace(/^\- (.*?)$/gm, '<li>$1</li>');
+  formatted = formatted.replace(/^\* (.*?)$/gm, '<li>$1</li>');
+  
+  // Links
+  formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-600 hover:underline">$1</a>');
+  
+  // Line breaks
+  formatted = formatted.replace(/\n/g, '<br>');
+  
+  return formatted;
+}
+
 export function summarizeMessages(
   messages: MessageForSummary[],
   channelName: string
@@ -56,6 +85,11 @@ Please provide a concise summary of the important points discussed. Focus on:
 - Action items assigned to people
 - Important announcements
 
+Format your response with Markdown:
+- Use **bold** for important categories
+- Use - for bullet points
+- Use proper headings for sections
+
 Keep the summary brief but informative.
       `;
       
@@ -91,8 +125,13 @@ Keep the summary brief but informative.
       const data = await response.json();
       const summary = data.choices[0].message.content;
       
-      // Append the summary
-      streamable.append(<div className="whitespace-pre-wrap">{summary}</div>);
+      // Append the summary with markdown formatting
+      streamable.append(
+        <div 
+          className="whitespace-pre-wrap prose prose-sm max-w-none" 
+          dangerouslySetInnerHTML={{ __html: renderMarkdown(summary) }}
+        />
+      );
       
       // Show success toast
       toast({

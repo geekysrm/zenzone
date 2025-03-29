@@ -1,7 +1,6 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { StreamableUI } from "ai/rsc";
 import { MessageForSummary, summarizeMessages } from "@/utils/summaryUtils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,7 @@ interface MessageSummaryProps {
 }
 
 export default function MessageSummary({ messages, channelName }: MessageSummaryProps) {
-  const [summary, setSummary] = useState<StreamableUI | null>(null);
+  const [summary, setSummary] = useState<React.ReactNode | null>(null);
   const [apiKey, setApiKey] = useState("");
   const [showApiInput, setShowApiInput] = useState(true);
   

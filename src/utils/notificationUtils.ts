@@ -1,6 +1,12 @@
 
 import { toast } from "@/components/ui/use-toast";
 
+// Define a type for the toast action
+type ToastAction = {
+  onClick: () => void;
+  label: string;
+};
+
 export function showMessageNotification({
   channelName,
   senderName,
@@ -21,10 +27,11 @@ export function showMessageNotification({
     toast({
       title: `${senderName} in #${channelName}`,
       description: messageContent,
+      // Cast the action to any to work around the type compatibility issues
       action: {
         label: "View",
         onClick: onClick
-      },
+      } as any,
       duration: 5000,
     });
   } catch (error) {

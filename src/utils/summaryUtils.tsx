@@ -1,10 +1,10 @@
 
 import React from "react";
-import { createStreamableUI, StreamableUI } from "ai/rsc";
+import { createStreamableUI } from "ai/rsc";
 import { toast } from "@/components/ui/use-toast";
 
 // This will store any ongoing summarization tasks
-let activeSummarization: StreamableUI | null = null;
+let activeSummarization: ReturnType<typeof createStreamableUI> | null = null;
 
 export type MessageForSummary = {
   senderName: string;
@@ -16,7 +16,7 @@ export function summarizeMessages(
   messages: MessageForSummary[],
   channelName: string,
   apiKey: string
-): StreamableUI {
+) {
   // Cancel any existing summarization
   if (activeSummarization) {
     activeSummarization.done();
@@ -24,8 +24,8 @@ export function summarizeMessages(
   }
   
   // Create a new streamable UI
-  const { ui, append, done, isCompleted } = createStreamableUI();
-  activeSummarization = ui;
+  const streamable = createStreamableUI();
+  activeSummarization = streamable;
   
   // Show loading toast
   toast({
@@ -90,7 +90,7 @@ Keep the summary brief but informative.
       const summary = data.choices[0].message.content;
       
       // Append the summary
-      append(<div className="whitespace-pre-wrap">{summary}</div>);
+      streamable.append(<div className="whitespace-pre-wrap">{summary}</div>);
       
       // Show success toast
       toast({
@@ -101,7 +101,7 @@ Keep the summary brief but informative.
       
     } catch (error) {
       console.error("Error during summarization:", error);
-      append(<div className="text-red-500">Error generating summary: {error.message}</div>);
+      streamable.append(<div className="text-red-500">Error generating summary: {error.message}</div>);
       
       toast({
         title: "Summarization Failed",
@@ -110,10 +110,10 @@ Keep the summary brief but informative.
         duration: 5000,
       });
     } finally {
-      done();
+      streamable.done();
       activeSummarization = null;
     }
   })();
   
-  return ui;
+  return streamable.value;
 }

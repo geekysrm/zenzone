@@ -200,6 +200,37 @@ export function ChatLayout({
     return [];
   };
 
+  // Helper function to parse event details from the database
+  const parseEventDetails = (eventData: Json | null): { type: string; details: string; time?: string } => {
+    if (!eventData) {
+      return { type: "default", details: "Unknown event" };
+    }
+    
+    // If it's already in the correct format
+    if (typeof eventData === 'object' && eventData !== null && 
+        'type' in eventData && 'details' in eventData) {
+      const parsed = {
+        type: String(eventData.type),
+        details: String(eventData.details)
+      };
+      
+      // Add time if available
+      if ('time' in eventData && eventData.time) {
+        return { ...parsed, time: String(eventData.time) };
+      }
+      
+      return parsed;
+    }
+    
+    // If it's a string, use it as details
+    if (typeof eventData === 'string') {
+      return { type: "info", details: eventData };
+    }
+    
+    // Fallback
+    return { type: "default", details: "Unknown event" };
+  };
+
   const fetchMessages = async () => {
     try {
       setIsLoadingMessages(true);
@@ -253,7 +284,7 @@ export function ChatLayout({
                 reactions: [],
                 attachments: parseAttachments(message.attachments),
                 isEvent: message.is_event || false,
-                eventDetails: message.event_details,
+                eventDetails: parseEventDetails(message.event_details),
               };
             });
             

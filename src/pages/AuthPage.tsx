@@ -1,12 +1,12 @@
 
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { Mail, Lock, UserPlus } from "lucide-react";
+import { Mail, Lock, UserPlus, ArrowLeft } from "lucide-react";
 import { 
   Form,
   FormControl,
@@ -31,6 +31,7 @@ const AuthPage = () => {
   const { user, isLoading } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<AuthFormValues>({
     resolver: zodResolver(authSchema),
@@ -87,18 +88,24 @@ const AuthPage = () => {
 
   // Redirect if already authenticated
   if (user && !isLoading) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/chat" replace />;
   }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-slate-50">
       <div className="w-full max-w-md space-y-8 bg-white p-8 shadow-lg rounded-lg">
-        <div className="text-center">
+        <div className="flex justify-between items-center">
+          <button 
+            onClick={() => navigate("/")} 
+            className="flex items-center text-gray-600 hover:text-primary transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back
+          </button>
           <h1 className="text-3xl font-bold">{isSignUp ? "Create Account" : "Welcome Back"}</h1>
-          <p className="mt-2 text-gray-600">
-            {isSignUp ? "Sign up to get started" : "Sign in to your account"}
-          </p>
         </div>
+        <p className="mt-2 text-gray-600 text-center">
+          {isSignUp ? "Sign up to get started" : "Sign in to your account"}
+        </p>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-8 space-y-6">

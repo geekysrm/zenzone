@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageForSummary, summarizeMessages } from "@/utils/summaryUtils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -13,21 +13,35 @@ interface MessageSummaryProps {
 export default function MessageSummary({ messages, channelName }: MessageSummaryProps) {
   const [summary, setSummary] = useState<React.ReactNode | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [summaryGenerated, setSummaryGenerated] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const hasMessages = messages.length > 0;
+  
+  // Reset summary state when messages or channel changes
+  useEffect(() => {
+    setSummary(null);
+    setSummaryGenerated(false);
+    setIsGenerating(false);
+  }, [messages, channelName]);
   
   const handleGenerateSummary = () => {
-    if (isGenerating) return;
+    if (isGenerating || !hasMessages || summaryGenerated) return;
     
     setIsGenerating(true);
     const summaryUI = summarizeMessages(messages, channelName);
     setSummary(summaryUI);
+    setSummaryGenerated(true);
   };
   
-  const hasMessages = messages.length > 0;
-  
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" disabled={!hasMessages}>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          disabled={!hasMessages}
+        >
           <Sparkles className="h-4 w-4 mr-2" />
           Summarize Unread
         </Button>
@@ -52,10 +66,10 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
           <div className="flex justify-end">
             <Button 
               onClick={handleGenerateSummary} 
-              disabled={isGenerating || !hasMessages}
+              disabled={isGenerating || !hasMessages || summaryGenerated}
             >
               <Sparkles className="h-4 w-4 mr-2" />
-              Generate Summary
+              {summaryGenerated ? "Summary Generated" : "Generate Summary"}
             </Button>
           </div>
         </div>

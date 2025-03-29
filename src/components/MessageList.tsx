@@ -92,7 +92,7 @@ function EventMessage({ message }: { message: Message }) {
               src={message.user.avatar}
               alt={message.user.name}
             />
-            <AvatarFallback>{message.user.name.substring(0, 2)}</AvatarFallback>
+            <AvatarFallback>{getInitials(message.user.name)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-baseline gap-2">
@@ -127,7 +127,7 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
           src={message.user.avatar}
           alt={message.user.name}
         />
-        <AvatarFallback>{message.user.name.substring(0, 2)}</AvatarFallback>
+        <AvatarFallback>{getInitials(message.user.name)}</AvatarFallback>
       </Avatar>
       
       <div className={cn(
@@ -196,4 +196,16 @@ function formatTimestamp(timestamp: string): string {
     console.error("Error formatting timestamp:", error);
     return "just now";
   }
+}
+
+// Helper function to get initials from name
+function getInitials(name: string): string {
+  if (!name) return "?";
+  
+  return name
+    .split(' ')
+    .map(part => part.charAt(0))
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
 }

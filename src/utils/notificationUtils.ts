@@ -21,9 +21,7 @@ export const showMessageNotification = ({
     title: `New message in #${channelName}`,
     description: `${senderName}: ${messageContent}`,
     duration: 5000,
-    action: onClick ? {
-      onClick: onClick,
-    } : undefined,
+    action: onClick ? onClick : undefined,
   });
 
   // Also play notification sound if browser supports it

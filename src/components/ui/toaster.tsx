@@ -35,9 +35,9 @@ export function Toaster() {
                 altText="View"
                 onClick={() => {
                   if (typeof action === 'function') {
-                    action()
-                  } else if (action.onClick) {
-                    action.onClick()
+                    action();
+                  } else if (typeof action === 'object' && action.onClick) {
+                    action.onClick();
                   }
                 }}
               >

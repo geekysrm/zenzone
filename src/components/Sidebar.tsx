@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/use-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface SidebarProps {
   sections: Section[];
@@ -19,6 +20,18 @@ interface SidebarProps {
   workspaceName: string;
   workspaceLogo: string;
   onChannelSelect: (channel: Channel) => void;
+}
+
+// Helper function to get initials from name
+function getInitials(name: string): string {
+  if (!name) return "?";
+  
+  return name
+    .split(' ')
+    .map(part => part.charAt(0))
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
 }
 
 export default function Sidebar({
@@ -30,6 +43,9 @@ export default function Sidebar({
 }: SidebarProps) {
   const { user, signOut } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  
+  const userName = user?.user_metadata?.name || "User";
+  const userAvatar = user?.user_metadata?.avatar_url;
 
   const renderChannelIcon = useCallback((channel: Channel) => {
     if (channel.type === "direct") {
@@ -111,15 +127,15 @@ export default function Sidebar({
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center space-x-2 w-full hover:bg-gray-800 p-2 rounded cursor-pointer">
-              <div className="relative">
-                <img
-                  src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=3"} 
-                  alt="Your avatar"
-                  className="w-8 h-8 rounded"
-                />
+              <Avatar className="w-8 h-8">
+                {userAvatar ? (
+                  <AvatarImage src={userAvatar} alt={userName} />
+                ) : (
+                  <AvatarFallback>{getInitials(userName)}</AvatarFallback>
+                )}
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slack-purple rounded-full"></span>
-              </div>
-              <span className="text-sm font-medium flex-1 text-left">{user?.user_metadata?.name || "You"}</span>
+              </Avatar>
+              <span className="text-sm font-medium flex-1 text-left">{userName}</span>
               <ChevronDown size={16} />
             </button>
           </DropdownMenuTrigger>

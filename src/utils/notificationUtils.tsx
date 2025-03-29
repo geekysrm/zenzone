@@ -7,12 +7,14 @@ export function showMessageNotification({
   channelName,
   senderName,
   messageContent,
-  onClick
+  onClick,
+  channelId
 }: {
   channelName: string;
   senderName: string;
   messageContent: string;
   onClick: () => void;
+  channelId?: string;
 }) {
   try {
     // Play notification sound
@@ -23,11 +25,10 @@ export function showMessageNotification({
     toast({
       title: `${senderName} in #${channelName}`,
       description: messageContent,
-      action: (
-        <ToastAction altText="View message" onClick={onClick}>
-          View
-        </ToastAction>
-      ),
+      action: {
+        label: "View",
+        onClick: onClick
+      },
       duration: 5000,
     });
   } catch (error) {

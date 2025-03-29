@@ -96,11 +96,12 @@ const Index = () => {
               .eq('id', payload.new.user_id)
               .single();
             
-            // Show notification with click handler to navigate to channel
+            // Show notification with click handler that will navigate to the channel
             showMessageNotification({
               channelName: targetChannel.name,
               senderName: profile?.username || 'Unknown user',
               messageContent: payload.new.content,
+              channelId: targetChannel.id,
               onClick: () => handleChannelSelect(targetChannel)
             });
           }

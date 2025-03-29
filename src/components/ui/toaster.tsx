@@ -12,12 +12,6 @@ import {
 } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 
-// Define a more flexible action type
-type ActionType = {
-  label?: string;
-  onClick?: () => void;
-} | React.ReactNode;
-
 export function Toaster() {
   const { toasts } = useToast()
 

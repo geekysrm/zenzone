@@ -1,3 +1,4 @@
+
 import React from "react";
 import { createStreamableUI, StreamableUI } from "@/utils/streamableUI";
 import { toast } from "@/components/ui/use-toast";
@@ -42,12 +43,18 @@ function renderMarkdown(text: string): string {
   return formatted;
 }
 
+// Remove HTML tags to get plain text
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>?/gm, '');
+}
+
 export function summarizeMessages(
   messages: MessageForSummary[],
   channelName: string,
   channelId?: string,
   messageCount?: number,
-  mode: 'unread' | 'recent' = 'unread'
+  mode: 'unread' | 'recent' = 'unread',
+  onSummaryText?: (text: string) => void
 ) {
   // Cancel any existing summarization
   if (activeSummarization) {
@@ -203,6 +210,11 @@ Keep the summary brief but informative.
       
       const responseData = await response.json();
       const summary = responseData.choices[0].message.content;
+      
+      // If there's a callback for the plain text summary, call it
+      if (onSummaryText) {
+        onSummaryText(summary);
+      }
       
       // Clear initial feedback
       streamable.value = null;

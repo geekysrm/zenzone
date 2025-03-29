@@ -5,6 +5,7 @@ import { Headphones, Paperclip } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { getInitials, getAvatarColors } from "@/utils/avatarUtils";
 
 interface MessageListProps {
   messages: Message[];
@@ -71,6 +72,10 @@ export default function MessageList({ messages, channelName }: MessageListProps)
 function EventMessage({ message }: { message: Message }) {
   if (!message.eventDetails) return null;
   
+  // Get user initials and colors
+  const userInitials = getInitials(message.user.name);
+  const avatarColors = getAvatarColors(message.user.name);
+  
   return (
     <div className="flex items-center pl-12 py-1">
       {message.eventDetails.type === "huddle" ? (
@@ -92,7 +97,9 @@ function EventMessage({ message }: { message: Message }) {
               src={message.user.avatar}
               alt={message.user.name}
             />
-            <AvatarFallback>{message.user.name.substring(0, 2)}</AvatarFallback>
+            <AvatarFallback className={cn(avatarColors.bg, avatarColors.text)}>
+              {userInitials}
+            </AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-baseline gap-2">
@@ -117,6 +124,10 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
   // Format the timestamp properly
   const timestamp = formatTimestamp(message.timestamp);
   
+  // Get user initials and avatar colors
+  const userInitials = getInitials(message.user.name);
+  const avatarColors = getAvatarColors(message.user.name);
+  
   return (
     <div className={cn(
       "flex items-start gap-2 hover:bg-gray-50 px-2 py-1 rounded",
@@ -127,7 +138,9 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
           src={message.user.avatar}
           alt={message.user.name}
         />
-        <AvatarFallback>{message.user.name.substring(0, 2)}</AvatarFallback>
+        <AvatarFallback className={cn(avatarColors.bg, avatarColors.text)}>
+          {userInitials}
+        </AvatarFallback>
       </Avatar>
       
       <div className={cn(

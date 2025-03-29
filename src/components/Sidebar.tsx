@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/use-toast";
+import { getInitials, getAvatarColors } from "@/utils/avatarUtils";
 
 interface SidebarProps {
   sections: Section[];
@@ -55,6 +56,11 @@ export default function Sidebar({
       });
     }
   };
+
+  // Get user's display name and initials
+  const userName = user?.user_metadata?.name || "Anonymous";
+  const userInitials = getInitials(userName);
+  const avatarColors = getAvatarColors(userName);
 
   return (
     <div className="flex flex-col h-screen bg-slack-purple text-white w-64 flex-shrink-0 overflow-y-auto">
@@ -112,14 +118,23 @@ export default function Sidebar({
           <DropdownMenuTrigger asChild>
             <button className="flex items-center space-x-2 w-full hover:bg-gray-800 p-2 rounded cursor-pointer">
               <div className="relative">
-                <img
-                  src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=3"} 
-                  alt="Your avatar"
-                  className="w-8 h-8 rounded"
-                />
+                {user?.user_metadata?.avatar_url ? (
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt="Your avatar"
+                    className="w-8 h-8 rounded"
+                  />
+                ) : (
+                  <div className={cn(
+                    "w-8 h-8 rounded flex items-center justify-center",
+                    avatarColors.bg, avatarColors.text
+                  )}>
+                    {userInitials}
+                  </div>
+                )}
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slack-purple rounded-full"></span>
               </div>
-              <span className="text-sm font-medium flex-1 text-left">{user?.user_metadata?.name || "You"}</span>
+              <span className="text-sm font-medium flex-1 text-left">{userName}</span>
               <ChevronDown size={16} />
             </button>
           </DropdownMenuTrigger>

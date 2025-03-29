@@ -30,18 +30,12 @@ export function Toaster() {
                 )}
               </div>
             </div>
-            {action && (
+            {action && typeof action === 'object' && 'onClick' in action && (
               <ToastAction 
-                altText="View"
-                onClick={() => {
-                  if (typeof action === 'function') {
-                    action()
-                  } else if (action.onClick) {
-                    action.onClick()
-                  }
-                }}
+                altText={action.altText || "View"}
+                onClick={action.onClick} 
               >
-                View
+                {action.altText || "View"}
               </ToastAction>
             )}
             <ToastClose />

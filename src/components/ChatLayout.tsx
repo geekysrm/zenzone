@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { Channel, Message, Section, Attachment } from "@/types/chat";
+import { Channel, Message, Section, User, Attachment } from "@/types/chat";
 import Sidebar from "@/components/Sidebar";
 import ChannelHeader from "@/components/ChannelHeader";
 import MessageList from "@/components/MessageList";
@@ -8,7 +7,6 @@ import MessageInput from "@/components/MessageInput";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { Json } from "@/integrations/supabase/types";
-import { useQuery } from "@tanstack/react-query";
 
 interface ChatLayoutProps {
   sections: Section[];
@@ -27,77 +25,13 @@ export function ChatLayout({
   workspaceLogo,
   setActiveChannel,
 }: ChatLayoutProps) {
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [participants, setParticipants] = useState<number>(0);
   const [channelTopic, setChannelTopic] = useState<string>("");
+  const [isLoadingMessages, setIsLoadingMessages] = useState(true);
   const { user } = useAuth();
 
-  // Query for fetching messages with caching
-  const { data: messages = [], isLoading: isLoadingMessages } = useQuery({
-    queryKey: ['messages', activeChannel.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('channel_id', activeChannel.id)
-        .order('timestamp', { ascending: true });
-        
-      if (error) {
-        console.error("Error fetching messages:", error);
-        return [];
-      }
-
-      // Fetch user profiles for these messages
-      const userIds = [...new Set(data.map(msg => msg.user_id))];
-      
-      if (userIds.length > 0) {
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('*')
-          .in('id', userIds);
-          
-        if (profilesError) {
-          console.error("Error fetching user profiles:", profilesError);
-          return [];
-        }
-
-        // Transform database messages to match our Message type
-        return data.map(message => {
-          const userProfile = profiles.find(profile => profile.id === message.user_id);
-          
-          return {
-            id: message.id,
-            content: message.content,
-            timestamp: message.timestamp,
-            user: userProfile 
-              ? {
-                  id: userProfile.id,
-                  name: userProfile.username || "Anonymous User",
-                  avatar: userProfile.avatar_url || `https://i.pravatar.cc/150?u=${userProfile.id}`,
-                  status: "online" as "online" | "offline" | "away"
-                }
-              : {
-                  id: message.user_id,
-                  name: "Unknown User",
-                  avatar: `https://i.pravatar.cc/150?u=${message.user_id}`,
-                  status: "offline" as "online" | "offline" | "away"
-                },
-            reactions: [],
-            attachments: parseAttachments(message.attachments),
-            isEvent: message.is_event || false,
-            eventDetails: parseEventDetails(message.event_details),
-          };
-        });
-      }
-      
-      return [];
-    },
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
-    gcTime: 1000 * 60 * 30,   // Keep unused data in cache for 30 minutes (formerly cacheTime)
-    refetchOnWindowFocus: false, // Don't refetch when window regains focus
-    refetchOnMount: false,      // Don't refetch on component mount if data is fresh
-  });
-
-  // When active channel changes, update channel topic
+  // When active channel changes, fetch new messages
   useEffect(() => {
     if (!activeChannel) return;
     
@@ -130,12 +64,98 @@ export function ChatLayout({
     }
     
     setChannelTopic(topic);
+    setIsLoadingMessages(true);
+
+    // Fetch messages for this channel
+    fetchMessages();
     
+    // Subscribe to realtime messages for this channel
+    const subscription = supabase
+      .channel(`messages:${activeChannel.id}`)
+      .on('postgres_changes', 
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'messages',
+          filter: `channel_id=eq.${activeChannel.id}`
+        }, 
+        (payload) => {
+          const newMessage = payload.new as any;
+          
+          // Only add the message if it's not already in the list
+          setMessages(currentMessages => {
+            const exists = currentMessages.some(m => m.id === newMessage.id);
+            if (exists) return currentMessages;
+            
+            // We need to fetch user data for this message
+            const messageWithUser: Message = {
+              id: newMessage.id,
+              content: newMessage.content,
+              timestamp: newMessage.timestamp,
+              user: {
+                id: newMessage.user_id,
+                name: "Loading...", // Placeholder until we fetch profile
+                avatar: `https://i.pravatar.cc/150?u=${newMessage.user_id}`,
+              },
+              reactions: [],
+              attachments: newMessage.attachments || [],
+              isEvent: newMessage.is_event || false,
+              eventDetails: newMessage.event_details,
+            };
+            
+            // Fetch user profile for this message
+            fetchUserProfile(newMessage.user_id);
+            
+            return [...currentMessages, messageWithUser];
+          });
+        }
+      )
+      .subscribe();
+      
     // Get participants count
     fetchParticipantsCount();
     
-  }, [activeChannel]);
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [activeChannel?.id, user]);
 
+  // Helper function to fetch a single user profile
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (error || !data) {
+        console.error("Error fetching user profile:", error);
+        return;
+      }
+      
+      // Update messages with this user's data
+      setMessages(currentMessages => 
+        currentMessages.map(message => 
+          message.user.id === userId
+            ? {
+                ...message,
+                user: {
+                  id: data.id,
+                  name: data.username || "Anonymous User",
+                  avatar: data.avatar_url || `https://i.pravatar.cc/150?u=${data.id}`,
+                  status: "online"
+                }
+              }
+            : message
+        )
+      );
+    } catch (err) {
+      console.error("Error in fetchUserProfile:", err);
+    }
+  };
+
+  // Helper function to parse attachments from the database
   const parseAttachments = (attachmentsData: Json | null): Attachment[] => {
     if (!attachmentsData) return [];
     
@@ -180,6 +200,7 @@ export function ChatLayout({
     return [];
   };
 
+  // Helper function to parse event details from the database
   const parseEventDetails = (eventData: Json | null): { type: string; details: string; time?: string } => {
     if (!eventData) {
       return { type: "default", details: "Unknown event" };
@@ -208,6 +229,79 @@ export function ChatLayout({
     
     // Fallback
     return { type: "default", details: "Unknown event" };
+  };
+
+  const fetchMessages = async () => {
+    try {
+      setIsLoadingMessages(true);
+      
+      // Fetch messages from the database
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('channel_id', activeChannel.id)
+        .order('timestamp', { ascending: true });
+        
+      if (error) {
+        console.error("Error fetching messages:", error);
+        return;
+      }
+      
+      // Need to fetch user profiles for these messages
+      const userIds = [...new Set(data.map(msg => msg.user_id))];
+      
+      if (userIds.length > 0) {
+        try {
+          const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('*')
+            .in('id', userIds);
+            
+          if (profilesError) {
+            console.error("Error fetching user profiles:", profilesError);
+          } else {
+            // Transform database messages to match our Message type
+            const messagesWithUserData: Message[] = data.map(message => {
+              const userProfile = profiles.find(profile => profile.id === message.user_id);
+              
+              return {
+                id: message.id,
+                content: message.content,
+                timestamp: message.timestamp,
+                user: userProfile 
+                  ? {
+                      id: userProfile.id,
+                      name: userProfile.username || "Anonymous User",
+                      avatar: userProfile.avatar_url || `https://i.pravatar.cc/150?u=${userProfile.id}`,
+                      status: "online"
+                    }
+                  : {
+                      id: message.user_id,
+                      name: "Unknown User",
+                      avatar: `https://i.pravatar.cc/150?u=${message.user_id}`,
+                      status: "offline"
+                    },
+                reactions: [],
+                attachments: parseAttachments(message.attachments),
+                isEvent: message.is_event || false,
+                eventDetails: parseEventDetails(message.event_details),
+              };
+            });
+            
+            setMessages(messagesWithUserData);
+          }
+        } catch (err) {
+          console.error("Error fetching user profiles:", err);
+        }
+      } else {
+        // If no messages, set empty array
+        setMessages([]);
+      }
+    } catch (err) {
+      console.error("Error in fetchMessages:", err);
+    } finally {
+      setIsLoadingMessages(false);
+    }
   };
 
   const fetchParticipantsCount = async () => {

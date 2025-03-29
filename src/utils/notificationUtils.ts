@@ -1,6 +1,6 @@
 
 import { toast } from "@/hooks/use-toast";
-import { getInitials, getAvatarUrl } from "@/utils/avatarUtils";
+import { getInitials, getAvatarColors } from "@/utils/avatarUtils";
 
 type NotificationOptions = {
   channelName: string;
@@ -24,8 +24,8 @@ export const showMessageNotification = ({
     duration: 5000,
     action: onClick ? {
       altText: "View",
-      onClick,
-      children: "View"
+      children: "View",
+      onClick
     } : undefined,
   });
 

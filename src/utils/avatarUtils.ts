@@ -1,7 +1,19 @@
 
 /**
- * Utility functions for avatar generation
+ * Utility functions for avatar generation and styling
  */
+
+// Colors for avatar backgrounds
+const backgroundColors = [
+  'bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 
+  'bg-red-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500',
+  'bg-orange-500', 'bg-cyan-500'
+];
+
+// Colors for avatar text
+const textColors = [
+  'text-white', 'text-gray-100', 'text-gray-800'
+];
 
 /**
  * Get initials from a name (first letter of first and last word)
@@ -24,44 +36,21 @@ export const getInitials = (name: string): string => {
 };
 
 /**
- * Generate avatar URL using multiavatar service
- * @param name The name to generate avatar for
- * @returns Avatar URL
- */
-export const getAvatarUrl = (name: string): string => {
-  if (!name) return "";
-  
-  // Create URL for multiavatar service
-  return `https://multiavatar.com/${encodeURIComponent(name)}`;
-};
-
-/**
- * Generate background and text colors for an avatar based on name
+ * Generate a consistent color pair based on a name string
  * @param name The name to generate colors for
- * @returns Object with bg (background color) and text (text color) properties
+ * @returns Object with background and text color classes
  */
-export const getAvatarColors = (name: string): { bg: string; text: string } => {
-  if (!name) return { bg: "bg-gray-200", text: "text-gray-700" };
-  
-  // List of background and corresponding text colors
-  const colorPairs = [
-    { bg: "bg-red-100", text: "text-red-800" },
-    { bg: "bg-blue-100", text: "text-blue-800" },
-    { bg: "bg-green-100", text: "text-green-800" },
-    { bg: "bg-yellow-100", text: "text-yellow-800" },
-    { bg: "bg-purple-100", text: "text-purple-800" },
-    { bg: "bg-pink-100", text: "text-pink-800" },
-    { bg: "bg-indigo-100", text: "text-indigo-800" },
-    { bg: "bg-gray-100", text: "text-gray-800" },
-  ];
-  
-  // Simple hash function to get deterministic colors based on name
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+export const getAvatarColors = (name: string): { bg: string, text: string } => {
+  if (!name) {
+    return { bg: 'bg-gray-500', text: 'text-white' };
   }
   
-  // Select a color pair based on the hash
-  const index = Math.abs(hash) % colorPairs.length;
-  return colorPairs[index];
+  // Use the sum of character codes as a simple hash
+  const hash = name.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  
+  // Select colors based on the hash
+  const bgColor = backgroundColors[hash % backgroundColors.length];
+  const txtColor = textColors[hash % textColors.length];
+  
+  return { bg: bgColor, text: txtColor };
 };

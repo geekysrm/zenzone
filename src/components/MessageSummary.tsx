@@ -61,35 +61,25 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
               </div>
             ) : (
               isGenerating ? (
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Skeleton className="h-5 w-5 rounded-full" />
-                    <Skeleton className="h-5 w-32" />
-                  </div>
-                  
+                <div className="space-y-4">
                   <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-[90%]" />
-                  <Skeleton className="h-4 w-[95%]" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
                   
                   <div className="pt-2">
                     <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-[92%] mt-1" />
-                    <Skeleton className="h-4 w-[85%] mt-1" />
+                    <Skeleton className="h-4 w-5/6" />
                   </div>
                   
                   <div className="pt-2">
-                    <Skeleton className="h-5 w-40" />
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-full" />
-                    </div>
+                    <Skeleton className="h-4 w-4/5" />
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="h-4 w-full" />
                   </div>
                   
                   <div className="pt-2">
-                    <Skeleton className="h-5 w-36" />
-                    <Skeleton className="h-4 w-full mt-1" />
-                    <Skeleton className="h-4 w-[88%] mt-1" />
-                    <Skeleton className="h-4 w-[92%] mt-1" />
+                    <Skeleton className="h-4 w-11/12" />
+                    <Skeleton className="h-4 w-1/2" />
                   </div>
                 </div>
               ) : (

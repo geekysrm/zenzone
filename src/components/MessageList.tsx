@@ -1,10 +1,10 @@
+
 import { Message } from "@/types/chat";
 import { formatRelativeTime } from "@/lib/dateUtils";
 import { Headphones, Paperclip } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { getInitials, getAvatarUrl } from "@/utils/avatarUtils";
+import { getInitials } from "@/utils/avatarUtils";
 
 interface MessageListProps {
   messages: Message[];
@@ -73,8 +73,8 @@ function EventMessage({ message }: { message: Message }) {
   
   // Get user initials
   const userInitials = getInitials(message.user.name);
-  // Get avatar URL
-  const avatarUrl = getAvatarUrl(message.user.email || message.user.id);
+  // Generate avatar URL using user ID as fallback if email is not available
+  const avatarUrl = `https://i.pravatar.cc/150?u=${message.user.id}`;
   
   return (
     <div className="flex items-center pl-12 py-1">
@@ -92,15 +92,11 @@ function EventMessage({ message }: { message: Message }) {
         </div>
       ) : (
         <div className="flex items-start gap-2">
-          <Avatar className="w-9 h-9 flex-shrink-0 mt-1">
-            <AvatarImage
-              src={message.user.avatar || avatarUrl}
-              alt={message.user.name}
-            />
-            <AvatarFallback>
-              {userInitials}
-            </AvatarFallback>
-          </Avatar>
+          <img 
+            src={message.user.avatar || avatarUrl}
+            alt={message.user.name}
+            className="w-9 h-9 flex-shrink-0 mt-1 rounded-full object-cover"
+          />
           <div className="flex-1">
             <div className="flex items-baseline gap-2">
               <span className="font-bold text-gray-800">{message.user.name}</span>
@@ -124,24 +120,21 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
   // Format the timestamp properly
   const timestamp = formatTimestamp(message.timestamp);
   
-  // Get user initials and avatar url
+  // Get user initials
   const userInitials = getInitials(message.user.name);
-  const avatarUrl = getAvatarUrl(message.user.email || message.user.id);
+  // Generate avatar URL using user ID as fallback if email is not available
+  const avatarUrl = `https://i.pravatar.cc/150?u=${message.user.id}`;
   
   return (
     <div className={cn(
       "flex items-start gap-2 hover:bg-gray-50 px-2 py-1 rounded",
       isCurrentUser ? "flex-row-reverse" : "flex-row"
     )}>
-      <Avatar className="w-9 h-9 flex-shrink-0 mt-1">
-        <AvatarImage
-          src={message.user.avatar || avatarUrl}
-          alt={message.user.name}
-        />
-        <AvatarFallback>
-          {userInitials}
-        </AvatarFallback>
-      </Avatar>
+      <img
+        src={message.user.avatar || avatarUrl}
+        alt={message.user.name}
+        className="w-9 h-9 flex-shrink-0 mt-1 rounded-full object-cover"
+      />
       
       <div className={cn(
         "flex-1 max-w-[85%]",

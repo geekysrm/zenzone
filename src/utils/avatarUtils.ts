@@ -24,16 +24,6 @@ export const getInitials = (name: string): string => {
 };
 
 /**
- * Generate an avatar URL using pravatar.cc
- * @param email The email to generate avatar for
- * @returns URL for the avatar image
- */
-export const getAvatarUrl = (email: string): string => {
-  if (!email) return "https://i.pravatar.cc/150";
-  return `https://i.pravatar.cc/150?u=${encodeURIComponent(email)}`;
-};
-
-/**
  * Generate avatar colors (keeping this for backward compatibility)
  */
 export const getAvatarColors = (): { bg: string, text: string } => {

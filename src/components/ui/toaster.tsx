@@ -9,7 +9,7 @@ import {
   ToastViewport,
   ToastAction
 } from "@/components/ui/toast"
-import { getInitials, getAvatarUrl } from "@/utils/avatarUtils"
+import { getInitials } from "@/utils/avatarUtils"
 import { cn } from "@/lib/utils"
 
 export function Toaster() {
@@ -25,7 +25,7 @@ export function Toaster() {
           : "Notification");
         
         // Generate an avatar URL based on the notification title
-        const avatarUrl = getAvatarUrl(notificationTitle);
+        const avatarUrl = `https://i.pravatar.cc/150?u=${notificationTitle}`;
 
         return (
           <Toast key={id} {...props}>
@@ -44,12 +44,18 @@ export function Toaster() {
                 )}
               </div>
             </div>
-            {action && typeof action === 'object' && 'onClick' in action && (
+            {action && (
               <ToastAction 
-                altText={typeof action.children === 'string' ? action.children : "View"} 
-                onClick={action.onClick}
+                altText={typeof action === 'object' && 'children' in action && typeof action.children === 'string' 
+                  ? action.children 
+                  : "View"} 
+                onClick={typeof action === 'object' && 'onClick' in action 
+                  ? () => { 
+                      if (typeof action.onClick === 'function') action.onClick(); 
+                    } 
+                  : undefined}
               >
-                {action.children}
+                {typeof action === 'object' && 'children' in action ? action.children : "View"}
               </ToastAction>
             )}
             <ToastClose />

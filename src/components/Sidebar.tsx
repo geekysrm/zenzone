@@ -1,3 +1,4 @@
+
 import { Channel, Section } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
@@ -10,8 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "@/components/ui/use-toast";
-import { getInitials, getAvatarUrl } from "@/utils/avatarUtils";
+import { toast } from "@/hooks/use-toast";
+import { getInitials } from "@/utils/avatarUtils";
 
 interface SidebarProps {
   sections: Section[];
@@ -59,9 +60,9 @@ export default function Sidebar({
   // Get user's display name and initials
   const userName = user?.user_metadata?.name || "Anonymous";
   const userInitials = getInitials(userName);
-  // Generate avatar URL using email
+  // Generate avatar URL using email or ID
   const userEmail = user?.email || "";
-  const avatarUrl = getAvatarUrl(userEmail);
+  const avatarUrl = userEmail ? `https://i.pravatar.cc/150?u=${userEmail}` : `https://i.pravatar.cc/150?u=${user?.id || "anonymous"}`;
 
   return (
     <div className="flex flex-col h-screen bg-slack-purple text-white w-64 flex-shrink-0 overflow-y-auto">

@@ -1,4 +1,3 @@
-
 import { Channel, Section } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
@@ -150,7 +149,7 @@ export default function Sidebar({
                         )}
                       </button>
                       
-                      {/* Sparkle icon with tooltip for summarization */}
+                      {/* Sparkle icon with tooltip for summarization - updated tooltip text here */}
                       {channel.unreadCount > 0 && (
                         <TooltipProvider>
                           <Tooltip>
@@ -162,13 +161,13 @@ export default function Sidebar({
                                   "focus:opacity-100 focus:outline-none z-10",
                                   activeChannel.id === channel.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                                 )}
-                                aria-label="Summarize unread messages"
+                                aria-label="Summarize recent messages"
                               >
                                 <Sparkles size={14} />
                               </button>
                             </TooltipTrigger>
                             <TooltipContent side="right">
-                              <p className="text-xs">Summarize Unread</p>
+                              <p className="text-xs">Summarize Recent</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -239,12 +238,12 @@ export default function Sidebar({
         </div>
       </div>
       
-      {/* Summary Dialog */}
+      {/* Summary Dialog - update title text here */}
       <Dialog open={summaryDialogOpen} onOpenChange={setSummaryDialogOpen}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>
-              {currentSummaryChannel && `Unread Messages Summary for #${currentSummaryChannel.name}`}
+              {currentSummaryChannel && `Recent Messages Summary for #${currentSummaryChannel.name}`}
             </DialogTitle>
           </DialogHeader>
           
@@ -279,8 +278,8 @@ export default function Sidebar({
                   </div>
                 ) : (
                   currentSummaryChannel && currentSummaryChannel.unreadCount > 0
-                    ? "Creating summary of unread messages..." 
-                    : "No unread messages to summarize."
+                    ? "Creating summary of recent messages..." 
+                    : "No recent messages to summarize."
                 )
               )}
             </div>

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { toast } from "@/hooks/use-toast";
+import { Bell } from "lucide-react";
 import { ToastAction } from "@/components/ui/toast";
 
 export function showMessageNotification({
@@ -34,3 +35,4 @@ export function showMessageNotification({
     console.error('Error showing notification:', error);
   }
 }
+

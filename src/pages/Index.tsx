@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import ChatLayout from "@/components/ChatLayout";
 import { Channel, Message } from "@/types/chat";
@@ -126,7 +125,7 @@ const Index = () => {
         activeChannel={activeChannel}
         messages={messages}
         workspaceName="Lumon Industries"
-        workspaceLogo="https://res.cloudinary.com/geekysrm/image/upload/v1743286433/lumon_rpk7hb.jpg"
+        workspaceLogo="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx3YKPIKk4yoghqGtF2yqzhEPXY0co1X2Fkw&s"
         setActiveChannel={handleChannelSelect}
       />
     </div>

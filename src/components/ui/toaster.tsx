@@ -7,6 +7,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
+  ToastAction
 } from "@/components/ui/toast"
 import { Bell } from "lucide-react"
 
@@ -29,7 +30,14 @@ export function Toaster() {
                 )}
               </div>
             </div>
-            {action}
+            {action && (
+              <ToastAction 
+                altText={action.altText} 
+                onClick={action.onClick}
+              >
+                {action.children}
+              </ToastAction>
+            )}
             <ToastClose />
           </Toast>
         )

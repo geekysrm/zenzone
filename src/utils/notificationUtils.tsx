@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
 export function showMessageNotification({

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import ChannelHeader from "./ChannelHeader";
@@ -45,46 +46,70 @@ export default function ChatLayout({
       if (!activeChannel) return;
       
       try {
-        const { data, error } = await supabase
+        // Fetch messages for the active channel
+        const { data: messagesData, error: messagesError } = await supabase
           .from('messages')
           .select('*')
           .eq('channel_id', activeChannel.id)
           .order('timestamp', { ascending: true });
           
-        if (error) {
-          console.error('Error fetching messages:', error);
+        if (messagesError) {
+          console.error('Error fetching messages:', messagesError);
           return;
         }
         
-        if (data) {
-          // Convert Supabase data to Message format
-          const formattedMessages: Message[] = data.map(msg => ({
-            id: msg.id,
-            content: msg.content,
-            timestamp: new Date(msg.timestamp).toISOString(),
-            user: {
-              id: msg.user_id,
-              name: user?.user_metadata?.name || 'User',
-              avatar: `https://i.pravatar.cc/150?u=${user?.user_metadata?.email}`,
-              email: user?.user_metadata?.email,
-            },
-            isEvent: msg.is_event || false,
-            eventDetails: msg.event_details && typeof msg.event_details === 'object' ? {
-              type: (msg.event_details as any).type || 'generic',
-              details: (msg.event_details as any).details || '',
-              time: (msg.event_details as any).time || undefined
-            } : undefined,
-            attachments: msg.attachments ? 
-              Array.isArray(msg.attachments) ? 
-                msg.attachments.map((att: any) => ({
-                  id: att.id || `att-${Date.now()}`,
-                  type: att.type || 'file',
-                  name: att.name || 'File',
-                  url: att.url || '#',
-                  previewUrl: att.previewUrl || 'No preview'
-                })) : [] 
-              : [],
-          }));
+        // Collect all unique user IDs from messages
+        const userIds = [...new Set(messagesData.map(msg => msg.user_id))];
+        
+        // Fetch all relevant user profiles
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('*')
+          .in('id', userIds);
+          
+        if (profilesError) {
+          console.error('Error fetching user profiles:', profilesError);
+        }
+        
+        // Create a lookup map for quick access to user profiles
+        const userProfiles = profilesData?.reduce((acc, profile) => {
+          acc[profile.id] = profile;
+          return acc;
+        }, {}) || {};
+        
+        if (messagesData) {
+          // Convert Supabase data to Message format, matching each message with its sender's profile
+          const formattedMessages: Message[] = messagesData.map(msg => {
+            const userProfile = userProfiles[msg.user_id] || {};
+            
+            return {
+              id: msg.id,
+              content: msg.content,
+              timestamp: new Date(msg.timestamp).toISOString(),
+              user: {
+                id: msg.user_id,
+                name: userProfile.username || 'Unknown User',
+                avatar: userProfile.avatar_url || `https://i.pravatar.cc/150?u=${msg.user_id}`,
+                email: userProfile.email,
+              },
+              isEvent: msg.is_event || false,
+              eventDetails: msg.event_details && typeof msg.event_details === 'object' ? {
+                type: (msg.event_details as any).type || 'generic',
+                details: (msg.event_details as any).details || '',
+                time: (msg.event_details as any).time || undefined
+              } : undefined,
+              attachments: msg.attachments ? 
+                Array.isArray(msg.attachments) ? 
+                  msg.attachments.map((att: any) => ({
+                    id: att.id || `att-${Date.now()}`,
+                    type: att.type || 'file',
+                    name: att.name || 'File',
+                    url: att.url || '#',
+                    previewUrl: att.previewUrl || 'No preview'
+                  })) : [] 
+                : [],
+            };
+          });
           
           setMessages(formattedMessages);
         }
@@ -105,8 +130,19 @@ export default function ChatLayout({
           table: 'messages',
           filter: `channel_id=eq.${activeChannel.id}`
         }, 
-        (payload) => {
+        async (payload) => {
           const newMessage = payload.new;
+          
+          // Fetch the user profile for this message
+          const { data: userProfile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', newMessage.user_id)
+            .single();
+            
+          if (profileError && profileError.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
+            console.error('Error fetching user profile:', profileError);
+          }
           
           // Add new message to state
           setMessages(prevMessages => [
@@ -117,8 +153,9 @@ export default function ChatLayout({
               timestamp: new Date(newMessage.timestamp).toISOString(),
               user: {
                 id: newMessage.user_id,
-                name: user?.user_metadata?.name || 'User',
-                avatar: user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User&background=random',
+                name: userProfile?.username || 'Unknown User',
+                avatar: userProfile?.avatar_url || `https://i.pravatar.cc/150?u=${newMessage.user_id}`,
+                email: userProfile?.email,
               },
               isEvent: newMessage.is_event || false,
               eventDetails: newMessage.event_details && typeof newMessage.event_details === 'object' ? {

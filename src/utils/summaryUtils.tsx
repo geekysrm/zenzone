@@ -2,12 +2,10 @@
 import React from "react";
 import { createStreamableUI, StreamableUI } from "@/utils/streamableUI";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 // This will store any ongoing summarization tasks
 let activeSummarization: StreamableUI | null = null;
-
-// Hardcoded API key (not recommended for production)
-const API_KEY = "sk-proj-F8sgXaquIE9Creh5ntS7T3BlbkFJ0XK4URzASfYkwICq9wIq";
 
 export type MessageForSummary = {
   senderName: string;
@@ -68,6 +66,17 @@ export function summarizeMessages(
   // Start the summarization process
   (async () => {
     try {
+      // Get the API key from Supabase
+      const { data } = await supabase.functions.invoke("get-api-key", {
+        body: { key: "AI_API_KEY" }
+      });
+      
+      const apiKey = data?.apiKey;
+      
+      if (!apiKey) {
+        throw new Error("Failed to retrieve API key from Supabase");
+      }
+      
       // Format messages for the prompt
       const formattedMessages = messages.map(msg => 
         `${new Date(msg.timestamp).toLocaleTimeString()} - ${msg.senderName}: ${msg.content}`
@@ -98,7 +107,7 @@ Keep the summary brief but informative.
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${API_KEY}`
+          "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",

@@ -23,7 +23,6 @@ export const showMessageNotification = ({
     description: `${senderName}: ${messageContent}`,
     duration: 5000,
     action: onClick ? {
-      altText: "View",
       children: "View",
       onClick
     } : undefined,

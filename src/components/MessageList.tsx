@@ -73,8 +73,8 @@ function EventMessage({ message }: { message: Message }) {
   
   // Get user initials
   const userInitials = getInitials(message.user.name);
-  // Generate avatar URL using user ID as fallback if email is not available
-  const avatarUrl = `https://i.pravatar.cc/150?u=${message.user.id}`;
+  // Generate avatar URL using email
+  const avatarUrl = `https://i.pravatar.cc/150?u=${message.user.email || message.user.id}`;
   
   return (
     <div className="flex items-center pl-12 py-1">
@@ -122,8 +122,8 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
   
   // Get user initials
   const userInitials = getInitials(message.user.name);
-  // Generate avatar URL using user ID as fallback if email is not available
-  const avatarUrl = `https://i.pravatar.cc/150?u=${message.user.id}`;
+  // Generate avatar URL using email
+  const avatarUrl = `https://i.pravatar.cc/150?u=${message.user.email || message.user.id}`;
   
   return (
     <div className={cn(

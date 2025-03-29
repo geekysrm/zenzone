@@ -46,8 +46,8 @@ export function Toaster() {
             </div>
             {action && (
               <ToastAction 
-                altText={typeof action === 'object' && 'children' in action && typeof action.children === 'string' 
-                  ? action.children 
+                altText={typeof action === 'object' && 'children' in action 
+                  ? String(action.children) 
                   : "View"} 
                 onClick={typeof action === 'object' && 'onClick' in action 
                   ? () => { 

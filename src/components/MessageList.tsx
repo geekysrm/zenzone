@@ -4,6 +4,7 @@ import { Headphones, Paperclip, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { getInitials } from "@/utils/avatarUtils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface MessageListProps {
   messages: Message[];
@@ -53,30 +54,32 @@ export default function MessageList({ messages, channelName, isLoading = false }
   });
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 bg-white">
-      {Object.entries(groupedMessages).map(([date, dateMessages]) => (
-        <div key={date} className="mb-4">
-          <div className="flex items-center justify-center mb-4">
-            <div className="h-px bg-gray-200 flex-grow"></div>
-            <div className="px-3 text-xs text-gray-500 font-medium">{date}</div>
-            <div className="h-px bg-gray-200 flex-grow"></div>
-          </div>
-          
-          {dateMessages.map((message) => (
-            <div key={message.id} className="mb-2">
-              {message.isEvent ? (
-                <EventMessage message={message} />
-              ) : (
-                <UserMessage 
-                  message={message} 
-                  isCurrentUser={message.user.id === user?.id} 
-                />
-              )}
+    <ScrollArea className="h-full">
+      <div className="p-4 bg-white">
+        {Object.entries(groupedMessages).map(([date, dateMessages]) => (
+          <div key={date} className="mb-4">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-px bg-gray-200 flex-grow"></div>
+              <div className="px-3 text-xs text-gray-500 font-medium">{date}</div>
+              <div className="h-px bg-gray-200 flex-grow"></div>
             </div>
-          ))}
-        </div>
-      ))}
-    </div>
+            
+            {dateMessages.map((message) => (
+              <div key={message.id} className="mb-2">
+                {message.isEvent ? (
+                  <EventMessage message={message} />
+                ) : (
+                  <UserMessage 
+                    message={message} 
+                    isCurrentUser={message.user.id === user?.id} 
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </ScrollArea>
   );
 }
 

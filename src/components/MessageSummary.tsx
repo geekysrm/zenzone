@@ -13,7 +13,6 @@ interface MessageSummaryProps {
 export default function MessageSummary({ messages, channelName }: MessageSummaryProps) {
   const [summary, setSummary] = useState<React.ReactNode | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [summaryGenerated, setSummaryGenerated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   
   const hasMessages = messages.length > 0;
@@ -21,21 +20,23 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
   // Reset summary state when messages or channel changes
   useEffect(() => {
     setSummary(null);
-    setSummaryGenerated(false);
     setIsGenerating(false);
   }, [messages, channelName]);
   
-  const handleGenerateSummary = () => {
-    if (isGenerating || !hasMessages || summaryGenerated) return;
+  // Generate summary when dialog is opened
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
     
-    setIsGenerating(true);
-    const summaryUI = summarizeMessages(messages, channelName);
-    setSummary(summaryUI);
-    setSummaryGenerated(true);
+    // If opening the dialog and we have messages, generate summary
+    if (open && hasMessages && !summary) {
+      setIsGenerating(true);
+      const summaryUI = summarizeMessages(messages, channelName);
+      setSummary(summaryUI);
+    }
   };
   
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button 
           variant="outline" 
@@ -58,19 +59,21 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
                 {summary}
               </div>
             ) : (
-              hasMessages 
-                ? "Click 'Generate Summary' to create a summary of unread messages."
-                : "No unread messages to summarize."
+              isGenerating ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <div className="animate-spin mb-2">
+                      <Sparkles className="h-6 w-6" />
+                    </div>
+                    <p>Generating summary...</p>
+                  </div>
+                </div>
+              ) : (
+                hasMessages 
+                  ? "Click to create a summary of unread messages." 
+                  : "No unread messages to summarize."
+              )
             )}
-          </div>
-          <div className="flex justify-end">
-            <Button 
-              onClick={handleGenerateSummary} 
-              disabled={isGenerating || !hasMessages || summaryGenerated}
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              {summaryGenerated ? "Summary Generated" : "Generate Summary"}
-            </Button>
           </div>
         </div>
       </DialogContent>

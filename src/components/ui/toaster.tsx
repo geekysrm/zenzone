@@ -41,14 +41,14 @@ export function Toaster() {
             </div>
             {action && typeof action === 'object' && 'label' in action && (
               <ToastAction 
-                altText={action.label || "View"} 
+                altText={typeof action.label === 'string' ? action.label : "View"} 
                 onClick={() => {
                   if ('onClick' in action && typeof action.onClick === 'function') {
                     action.onClick();
                   }
                 }}
               >
-                {action.label || "View"}
+                {typeof action.label === 'string' ? action.label : "View"}
               </ToastAction>
             )}
             <ToastClose />

@@ -1,11 +1,10 @@
-
 import { Message } from "@/types/chat";
 import { formatRelativeTime } from "@/lib/dateUtils";
 import { Headphones, Paperclip } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { getInitials, getAvatarColors } from "@/utils/avatarUtils";
+import { getInitials, getAvatarUrl } from "@/utils/avatarUtils";
 
 interface MessageListProps {
   messages: Message[];
@@ -72,9 +71,9 @@ export default function MessageList({ messages, channelName }: MessageListProps)
 function EventMessage({ message }: { message: Message }) {
   if (!message.eventDetails) return null;
   
-  // Get user initials and colors
+  // Get user initials and avatar URL
   const userInitials = getInitials(message.user.name);
-  const avatarColors = getAvatarColors(message.user.name);
+  const avatarUrl = getAvatarUrl(message.user.name);
   
   return (
     <div className="flex items-center pl-12 py-1">
@@ -93,16 +92,13 @@ function EventMessage({ message }: { message: Message }) {
       ) : (
         <div className="flex items-start gap-2">
           <Avatar className="w-9 h-9 flex-shrink-0 mt-1">
-            {message.user.avatar ? (
-              <AvatarImage
-                src={message.user.avatar}
-                alt={message.user.name}
-              />
-            ) : (
-              <AvatarFallback className={cn(avatarColors.bg, avatarColors.text)}>
-                {userInitials}
-              </AvatarFallback>
-            )}
+            <AvatarImage
+              src={avatarUrl || message.user.avatar}
+              alt={message.user.name}
+            />
+            <AvatarFallback>
+              {userInitials}
+            </AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-baseline gap-2">
@@ -127,9 +123,9 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
   // Format the timestamp properly
   const timestamp = formatTimestamp(message.timestamp);
   
-  // Get user initials and avatar colors
+  // Get user initials and avatar URL
   const userInitials = getInitials(message.user.name);
-  const avatarColors = getAvatarColors(message.user.name);
+  const avatarUrl = getAvatarUrl(message.user.name);
   
   return (
     <div className={cn(
@@ -137,16 +133,13 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
       isCurrentUser ? "flex-row-reverse" : "flex-row"
     )}>
       <Avatar className="w-9 h-9 flex-shrink-0 mt-1">
-        {message.user.avatar ? (
-          <AvatarImage
-            src={message.user.avatar}
-            alt={message.user.name}
-          />
-        ) : (
-          <AvatarFallback className={cn(avatarColors.bg, avatarColors.text)}>
-            {userInitials}
-          </AvatarFallback>
-        )}
+        <AvatarImage
+          src={avatarUrl || message.user.avatar}
+          alt={message.user.name}
+        />
+        <AvatarFallback>
+          {userInitials}
+        </AvatarFallback>
       </Avatar>
       
       <div className={cn(

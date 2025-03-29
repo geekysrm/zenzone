@@ -1,19 +1,7 @@
 
 /**
- * Utility functions for avatar generation and styling
+ * Utility functions for avatar generation
  */
-
-// Colors for avatar backgrounds
-const backgroundColors = [
-  'bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 
-  'bg-red-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500',
-  'bg-orange-500', 'bg-cyan-500'
-];
-
-// Colors for avatar text
-const textColors = [
-  'text-white', 'text-gray-100', 'text-gray-800'
-];
 
 /**
  * Get initials from a name (first letter of first and last word)
@@ -36,21 +24,13 @@ export const getInitials = (name: string): string => {
 };
 
 /**
- * Generate a consistent color pair based on a name string
- * @param name The name to generate colors for
- * @returns Object with background and text color classes
+ * Generate avatar URL using multiavatar service
+ * @param name The name to generate avatar for
+ * @returns Avatar URL
  */
-export const getAvatarColors = (name: string): { bg: string, text: string } => {
-  if (!name) {
-    return { bg: 'bg-gray-500', text: 'text-white' };
-  }
+export const getAvatarUrl = (name: string): string => {
+  if (!name) return "";
   
-  // Use the sum of character codes as a simple hash
-  const hash = name.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  
-  // Select colors based on the hash
-  const bgColor = backgroundColors[hash % backgroundColors.length];
-  const txtColor = textColors[hash % textColors.length];
-  
-  return { bg: bgColor, text: txtColor };
+  // Create URL for multiavatar service
+  return `https://multiavatar.com/${encodeURIComponent(name)}`;
 };

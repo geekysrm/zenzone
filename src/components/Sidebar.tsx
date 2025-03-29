@@ -1,4 +1,3 @@
-
 import { Channel, Section } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
@@ -12,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/use-toast";
-import { getInitials, getAvatarColors } from "@/utils/avatarUtils";
+import { getInitials, getAvatarUrl } from "@/utils/avatarUtils";
 
 interface SidebarProps {
   sections: Section[];
@@ -60,7 +59,7 @@ export default function Sidebar({
   // Get user's display name and initials
   const userName = user?.user_metadata?.name || "Anonymous";
   const userInitials = getInitials(userName);
-  const avatarColors = getAvatarColors(userName);
+  const avatarUrl = getAvatarUrl(userName);
 
   return (
     <div className="flex flex-col h-screen bg-slack-purple text-white w-64 flex-shrink-0 overflow-y-auto">
@@ -118,17 +117,14 @@ export default function Sidebar({
           <DropdownMenuTrigger asChild>
             <button className="flex items-center space-x-2 w-full hover:bg-gray-800 p-2 rounded cursor-pointer">
               <div className="relative">
-                {user?.user_metadata?.avatar_url ? (
+                {avatarUrl ? (
                   <img
-                    src={user.user_metadata.avatar_url}
+                    src={avatarUrl}
                     alt="Your avatar"
                     className="w-8 h-8 rounded"
                   />
                 ) : (
-                  <div className={cn(
-                    "w-8 h-8 rounded flex items-center justify-center",
-                    avatarColors.bg, avatarColors.text
-                  )}>
+                  <div className="w-8 h-8 rounded flex items-center justify-center bg-slate-500 text-white">
                     {userInitials}
                   </div>
                 )}

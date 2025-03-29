@@ -56,7 +56,8 @@ export default function ChatLayout({
             user: {
               id: msg.user_id,
               name: user?.user_metadata?.name || 'User',
-              avatar: user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User&background=random',
+              avatar: `https://i.pravatar.cc/150?u=${user?.user_metadata?.email}`,
+              email: user?.user_metadata?.email,
             },
             isEvent: msg.is_event || false,
             eventDetails: msg.event_details && typeof msg.event_details === 'object' ? {

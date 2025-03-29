@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Channel, Message, Section, Attachment } from "@/types/chat";
 import Sidebar from "@/components/Sidebar";
@@ -72,13 +73,13 @@ export function ChatLayout({
                   id: userProfile.id,
                   name: userProfile.username || "Anonymous User",
                   avatar: userProfile.avatar_url || `https://i.pravatar.cc/150?u=${userProfile.id}`,
-                  status: "online"
+                  status: "online" as "online" | "offline" | "away"
                 }
               : {
                   id: message.user_id,
                   name: "Unknown User",
                   avatar: `https://i.pravatar.cc/150?u=${message.user_id}`,
-                  status: "offline"
+                  status: "offline" as "online" | "offline" | "away"
                 },
             reactions: [],
             attachments: parseAttachments(message.attachments),
@@ -91,7 +92,9 @@ export function ChatLayout({
       return [];
     },
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
-    cacheTime: 1000 * 60 * 30, // Keep unused data in cache for 30 minutes
+    gcTime: 1000 * 60 * 30,   // Keep unused data in cache for 30 minutes (formerly cacheTime)
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false,      // Don't refetch on component mount if data is fresh
   });
 
   // When active channel changes, update channel topic

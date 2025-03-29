@@ -12,6 +12,11 @@ import {
 } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 
+interface ActionWithClick {
+  label: string;
+  onClick: () => void;
+}
+
 export function Toaster() {
   const { toasts } = useToast()
 
@@ -30,12 +35,15 @@ export function Toaster() {
               <ToastAction 
                 altText="Action"
                 onClick={() => {
-                  if (typeof action === 'object' && action.onClick) {
-                    action.onClick();
+                  // Type guard to check if action has onClick property
+                  if (typeof action === 'object' && 'onClick' in action) {
+                    (action as ActionWithClick).onClick();
                   }
                 }}
               >
-                {typeof action === 'object' && action.label ? action.label : 'Action'}
+                {typeof action === 'object' && 'label' in action 
+                  ? (action as ActionWithClick).label 
+                  : 'Action'}
               </ToastAction>
             )}
           </Toast>

@@ -3,11 +3,13 @@ import Sidebar from "./Sidebar";
 import ChannelHeader from "./ChannelHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
+import MessageSummary from "./MessageSummary";
 import { Channel, Message, Attachment } from "@/types/chat";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { showMessageNotification } from "@/utils/notificationUtils";
+import { MessageForSummary } from "@/utils/summaryUtils";
 
 interface ChatLayoutProps {
   sections: any[];
@@ -29,6 +31,13 @@ export default function ChatLayout({
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const { user } = useAuth();
   const topic = "Track and coordinate social media";
+
+  // Convert messages to the format required for summarization
+  const messagesForSummary: MessageForSummary[] = messages.map(msg => ({
+    senderName: msg.user.name,
+    content: msg.content,
+    timestamp: msg.timestamp
+  }));
 
   // Fetch messages from Supabase when active channel changes
   useEffect(() => {
@@ -264,11 +273,19 @@ export default function ChatLayout({
         onChannelSelect={setActiveChannel}
       />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <ChannelHeader
-          channel={activeChannel}
-          topic={topic}
-          participantCount={58}
-        />
+        <div className="flex items-center justify-between">
+          <ChannelHeader
+            channel={activeChannel}
+            topic={topic}
+            participantCount={58}
+          />
+          <div className="mr-4 flex items-center">
+            <MessageSummary 
+              messages={messagesForSummary} 
+              channelName={activeChannel.name} 
+            />
+          </div>
+        </div>
         <MessageList messages={messages} channelName={activeChannel.name} />
         <MessageInput 
           channelName={activeChannel.name} 

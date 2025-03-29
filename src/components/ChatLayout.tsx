@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import ChannelHeader from "./ChannelHeader";
@@ -89,8 +88,8 @@ export default function ChatLayout({
               user: {
                 id: msg.user_id,
                 name: userProfile.username || 'Unknown User',
-                avatar: userProfile.avatar_url || `https://i.pravatar.cc/150?u=${msg.user_id}`,
-                email: userProfile.email,
+                avatar: `https://i.pravatar.cc/150?u=${msg.user_id}`,
+                email: userProfile.username,
               },
               isEvent: msg.is_event || false,
               eventDetails: msg.event_details && typeof msg.event_details === 'object' ? {
@@ -154,8 +153,8 @@ export default function ChatLayout({
               user: {
                 id: newMessage.user_id,
                 name: userProfile?.username || 'Unknown User',
-                avatar: userProfile?.avatar_url || `https://i.pravatar.cc/150?u=${newMessage.user_id}`,
-                email: userProfile?.email,
+                avatar: `https://i.pravatar.cc/150?u=${newMessage.user_id}`,
+                email: userProfile?.username,
               },
               isEvent: newMessage.is_event || false,
               eventDetails: newMessage.event_details && typeof newMessage.event_details === 'object' ? {

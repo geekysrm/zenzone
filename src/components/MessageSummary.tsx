@@ -51,8 +51,8 @@ export default function MessageSummary({
       <DialogTrigger asChild>
         <Button 
           variant="outline" 
-          size="sm" 
-          disabled={!hasMessages}
+          size="sm"
+          // Removed the disabled prop to always show the button as active
         >
           <Sparkles className="h-4 w-4 mr-2" />
           {buttonText}

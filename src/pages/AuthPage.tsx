@@ -114,8 +114,6 @@ const AuthPage = () => {
     return <Navigate to="/" replace />;
   }
 
-  const activeForm = isSignUp ? signUpForm : loginForm;
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-slate-50">
       <div className="w-full max-w-md space-y-8 bg-white p-8 shadow-lg rounded-lg">

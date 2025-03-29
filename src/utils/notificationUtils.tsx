@@ -25,10 +25,11 @@ export function showMessageNotification({
     toast({
       title: `${senderName} in #${channelName}`,
       description: messageContent,
-      action: {
-        label: "View",
-        onClick: onClick
-      },
+      action: (
+        <ToastAction altText="View message" onClick={onClick}>
+          View
+        </ToastAction>
+      ),
       duration: 5000,
     });
   } catch (error) {

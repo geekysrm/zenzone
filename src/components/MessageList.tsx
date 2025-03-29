@@ -25,11 +25,22 @@ export default function MessageList({ messages, channelName }: MessageListProps)
   // Group messages by date
   const groupedMessages: { [key: string]: Message[] } = {};
   messages.forEach(message => {
-    const date = new Date(message.timestamp).toLocaleDateString();
-    if (!groupedMessages[date]) {
-      groupedMessages[date] = [];
+    // Ensure we have a valid date object
+    const messageDate = new Date(message.timestamp);
+    if (!isNaN(messageDate.getTime())) {
+      const date = messageDate.toLocaleDateString();
+      if (!groupedMessages[date]) {
+        groupedMessages[date] = [];
+      }
+      groupedMessages[date].push(message);
+    } else {
+      // Handle invalid dates by using current date as fallback
+      const today = new Date().toLocaleDateString();
+      if (!groupedMessages[today]) {
+        groupedMessages[today] = [];
+      }
+      groupedMessages[today].push(message);
     }
-    groupedMessages[date].push(message);
   });
 
   return (
@@ -86,7 +97,7 @@ function EventMessage({ message }: { message: Message }) {
           <div className="flex-1">
             <div className="flex items-baseline gap-2">
               <span className="font-bold text-gray-800">{message.user.name}</span>
-              <span className="text-xs text-gray-500">{message.timestamp}</span>
+              <span className="text-xs text-gray-500">{formatTimestamp(message.timestamp)}</span>
             </div>
             <p>{message.content}</p>
             <div className="mt-1 pl-4 border-l-2 border-gray-300">
@@ -103,11 +114,8 @@ function EventMessage({ message }: { message: Message }) {
 }
 
 function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUser: boolean }) {
-  // Format timestamp to match Slack
-  const timestamp = new Date(message.timestamp).toLocaleTimeString([], { 
-    hour: 'numeric', 
-    minute: '2-digit'
-  });
+  // Format the timestamp properly
+  const timestamp = formatTimestamp(message.timestamp);
   
   return (
     <div className={cn(
@@ -168,4 +176,24 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
       </div>
     </div>
   );
+}
+
+// Helper function to safely format timestamps
+function formatTimestamp(timestamp: string): string {
+  try {
+    const date = new Date(timestamp);
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return "just now";
+    }
+    
+    // Format time as HH:MM AM/PM
+    return date.toLocaleTimeString([], { 
+      hour: 'numeric', 
+      minute: '2-digit'
+    });
+  } catch (error) {
+    console.error("Error formatting timestamp:", error);
+    return "just now";
+  }
 }

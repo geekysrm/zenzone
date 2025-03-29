@@ -52,14 +52,18 @@ export default function ChatLayout({
           const formattedMessages: Message[] = data.map(msg => ({
             id: msg.id,
             content: msg.content,
-            timestamp: new Date(msg.timestamp).toLocaleString(),
+            timestamp: new Date(msg.timestamp).toISOString(),
             user: {
               id: msg.user_id,
               name: user?.user_metadata?.name || 'User',
               avatar: user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User&background=random',
             },
             isEvent: msg.is_event || false,
-            eventDetails: msg.event_details ? msg.event_details : undefined,
+            eventDetails: msg.event_details ? {
+              type: msg.event_details.type || 'generic',
+              details: msg.event_details.details || '',
+              time: msg.event_details.time || undefined
+            } : undefined,
             attachments: msg.attachments ? 
               Array.isArray(msg.attachments) ? 
                 msg.attachments.map((att: any) => ({
@@ -100,14 +104,18 @@ export default function ChatLayout({
             {
               id: newMessage.id,
               content: newMessage.content,
-              timestamp: new Date(newMessage.timestamp).toLocaleString(),
+              timestamp: new Date(newMessage.timestamp).toISOString(),
               user: {
                 id: newMessage.user_id,
                 name: user?.user_metadata?.name || 'User',
                 avatar: user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User&background=random',
               },
               isEvent: newMessage.is_event || false,
-              eventDetails: newMessage.event_details ? newMessage.event_details : undefined,
+              eventDetails: newMessage.event_details ? {
+                type: newMessage.event_details.type || 'generic',
+                details: newMessage.event_details.details || '',
+                time: newMessage.event_details.time || undefined
+              } : undefined,
               attachments: newMessage.attachments ? 
                 Array.isArray(newMessage.attachments) ? 
                   newMessage.attachments.map((att: any) => ({

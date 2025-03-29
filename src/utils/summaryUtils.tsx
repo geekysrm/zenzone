@@ -79,7 +79,7 @@ export function summarizeMessages(
         // Fetch the most recent 'unreadCount' messages for the channel
         const { data: messageData, error: messageError } = await supabase
           .from('messages')
-          .select('content, timestamp, user:user_id(name)')
+          .select('content, timestamp, user_id')
           .eq('channel_id', channelId)
           .order('timestamp', { ascending: false })
           .limit(unreadCount);
@@ -89,9 +89,30 @@ export function summarizeMessages(
         }
         
         if (messageData && messageData.length > 0) {
+          // Get all the user IDs from the messages
+          const userIds = messageData.map(msg => msg.user_id);
+          
+          // Fetch user profiles for those IDs
+          const { data: profilesData, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, username')
+            .in('id', userIds);
+            
+          if (profilesError) {
+            throw new Error(`Error fetching profiles: ${profilesError.message}`);
+          }
+          
+          // Create a map of user IDs to usernames
+          const userMap = new Map();
+          if (profilesData) {
+            profilesData.forEach(profile => {
+              userMap.set(profile.id, profile.username || 'Unknown User');
+            });
+          }
+          
           // Transform the message data into the correct format
           unreadMessages = messageData.map(msg => ({
-            senderName: msg.user?.name || 'Unknown User',
+            senderName: userMap.get(msg.user_id) || 'Unknown User',
             content: msg.content,
             timestamp: msg.timestamp
           })).reverse(); // Reverse to get chronological order
@@ -161,8 +182,8 @@ Keep the summary brief but informative.
         throw new Error(`OpenAI API error: ${errorData.error?.message || response.statusText}`);
       }
       
-      const data = await response.json();
-      const summary = data.choices[0].message.content;
+      const responseData = await response.json();
+      const summary = responseData.choices[0].message.content;
       
       // Append the summary with markdown formatting
       streamable.append(

@@ -59,8 +59,17 @@ export default function ChatLayout({
               avatar: user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User&background=random',
             },
             isEvent: msg.is_event || false,
-            eventDetails: msg.event_details || undefined,
-            attachments: msg.attachments ? (Array.isArray(msg.attachments) ? msg.attachments : []) : [],
+            eventDetails: msg.event_details ? msg.event_details : undefined,
+            attachments: msg.attachments ? 
+              Array.isArray(msg.attachments) ? 
+                msg.attachments.map((att: any) => ({
+                  id: att.id || `att-${Date.now()}`,
+                  type: att.type || 'file',
+                  name: att.name || 'File',
+                  url: att.url || '#',
+                  previewUrl: att.previewUrl || 'No preview'
+                })) : [] 
+              : [],
           }));
           
           setMessages(formattedMessages);
@@ -98,8 +107,17 @@ export default function ChatLayout({
                 avatar: user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User&background=random',
               },
               isEvent: newMessage.is_event || false,
-              eventDetails: newMessage.event_details || undefined,
-              attachments: newMessage.attachments ? (Array.isArray(newMessage.attachments) ? newMessage.attachments : []) : [],
+              eventDetails: newMessage.event_details ? newMessage.event_details : undefined,
+              attachments: newMessage.attachments ? 
+                Array.isArray(newMessage.attachments) ? 
+                  newMessage.attachments.map((att: any) => ({
+                    id: att.id || `att-${Date.now()}`,
+                    type: att.type || 'file',
+                    name: att.name || 'File',
+                    url: att.url || '#',
+                    previewUrl: att.previewUrl || 'No preview'
+                  })) : [] 
+                : [],
             }
           ]);
         }

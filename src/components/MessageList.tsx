@@ -112,7 +112,7 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
   return (
     <div className={cn(
       "flex items-start gap-2 hover:bg-gray-50 px-2 py-1 rounded",
-      isCurrentUser ? "justify-start" : "justify-start"
+      isCurrentUser ? "flex-row-reverse" : "flex-row"
     )}>
       <Avatar className="w-9 h-9 flex-shrink-0 mt-1">
         <AvatarImage
@@ -122,10 +122,25 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
         <AvatarFallback>{message.user.name.substring(0, 2)}</AvatarFallback>
       </Avatar>
       
-      <div className="flex-1 max-w-[85%]">
-        <div className="flex items-baseline gap-2">
-          <span className="font-bold text-gray-800">{message.user.name}</span>
-          <span className="text-xs text-gray-500">{timestamp}</span>
+      <div className={cn(
+        "flex-1 max-w-[85%]",
+        isCurrentUser ? "text-right" : "text-left"
+      )}>
+        <div className={cn(
+          "flex items-baseline gap-2",
+          isCurrentUser ? "justify-end" : "justify-start"
+        )}>
+          {isCurrentUser ? (
+            <>
+              <span className="text-xs text-gray-500">{timestamp}</span>
+              <span className="font-bold text-gray-800">{message.user.name}</span>
+            </>
+          ) : (
+            <>
+              <span className="font-bold text-gray-800">{message.user.name}</span>
+              <span className="text-xs text-gray-500">{timestamp}</span>
+            </>
+          )}
         </div>
         
         <div className="text-gray-800">
@@ -133,7 +148,10 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
         </div>
         
         {message.attachments && message.attachments.length > 0 && (
-          <div className="mt-2">
+          <div className={cn(
+            "mt-2",
+            isCurrentUser ? "flex justify-end" : ""
+          )}>
             {message.attachments.map(attachment => (
               <div key={attachment.id} className="flex items-center gap-2 p-2 border rounded bg-gray-50 max-w-md">
                 <div className="bg-purple-100 p-2 rounded">

@@ -46,7 +46,7 @@ export default function ChannelHeader({ channel, topic, participantCount }: Chan
           </div>
           <input
             type="text"
-            placeholder="Search Acme Inc"
+            placeholder="Search Lumon Industries"
             className="bg-gray-100 text-sm rounded-md pl-8 pr-4 py-1.5 w-64 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>

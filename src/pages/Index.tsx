@@ -125,8 +125,8 @@ const Index = () => {
         sections={sections}
         activeChannel={activeChannel}
         messages={messages}
-        workspaceName="Lovable"
-        workspaceLogo="https://lovable.dev/icon.svg"
+        workspaceName="Lumon Industries"
+        workspaceLogo="https://res.cloudinary.com/geekysrm/image/upload/v1743286433/lumon_rpk7hb.jpg"
         setActiveChannel={handleChannelSelect}
       />
     </div>

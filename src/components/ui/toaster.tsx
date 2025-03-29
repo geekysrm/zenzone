@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import {
@@ -26,8 +27,11 @@ export function Toaster() {
               )}
             </div>
             {action && (
-              <ToastAction altText={typeof action === 'string' ? action : 'Action'}>
-                {action}
+              <ToastAction 
+                altText={action.altText || "Action"} 
+                onClick={action.onClick}
+              >
+                {action.label}
               </ToastAction>
             )}
           </Toast>

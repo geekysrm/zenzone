@@ -1,3 +1,4 @@
+
 import { toast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
@@ -21,7 +22,11 @@ export function showMessageNotification({
     toast({
       title: `${senderName} in #${channelName}`,
       description: messageContent,
-      action: <ToastAction altText="View message" onClick={onClick}>View</ToastAction>,
+      action: {
+        label: "View",
+        altText: "View message",
+        onClick: onClick
+      },
       duration: 5000,
     });
   } catch (error) {

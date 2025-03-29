@@ -1,4 +1,3 @@
-
 import { Channel, Section } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
@@ -12,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/use-toast";
-import { getInitials, getAvatarColors } from "@/utils/avatarUtils";
+import { getInitials, getAvatarUrl } from "@/utils/avatarUtils";
 
 interface SidebarProps {
   sections: Section[];
@@ -60,7 +59,9 @@ export default function Sidebar({
   // Get user's display name and initials
   const userName = user?.user_metadata?.name || "Anonymous";
   const userInitials = getInitials(userName);
-  const avatarColors = getAvatarColors(userName);
+  // Generate avatar URL using email
+  const userEmail = user?.email || "";
+  const avatarUrl = getAvatarUrl(userEmail);
 
   return (
     <div className="flex flex-col h-screen bg-slack-purple text-white w-64 flex-shrink-0 overflow-y-auto">
@@ -125,12 +126,11 @@ export default function Sidebar({
                     className="w-8 h-8 rounded"
                   />
                 ) : (
-                  <div className={cn(
-                    "w-8 h-8 rounded flex items-center justify-center",
-                    avatarColors.bg, avatarColors.text
-                  )}>
-                    {userInitials}
-                  </div>
+                  <img
+                    src={avatarUrl}
+                    alt="Your avatar"
+                    className="w-8 h-8 rounded"
+                  />
                 )}
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slack-purple rounded-full"></span>
               </div>

@@ -9,7 +9,9 @@ import {
   ToastViewport,
   ToastAction
 } from "@/components/ui/toast"
-import { Bell } from "lucide-react"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { getInitials, getAvatarColors } from "@/utils/avatarUtils"
+import { cn } from "@/lib/utils"
 
 export function Toaster() {
   const { toasts } = useToast()
@@ -17,11 +19,18 @@ export function Toaster() {
   return (
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
+        // Generate initials for the notification
+        const notificationTitle = title || "";
+        const initials = getInitials(notificationTitle.includes("#") 
+          ? notificationTitle.split("#")[1] 
+          : "Notification");
+        const avatarColors = getAvatarColors(notificationTitle);
+
         return (
           <Toast key={id} {...props}>
             <div className="flex items-start gap-3">
-              <div className="h-9 w-9 rounded overflow-hidden flex-shrink-0 flex items-center justify-center bg-slate-100">
-                <Bell className="h-5 w-5 text-purple-500" />
+              <div className={cn("h-9 w-9 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center", avatarColors.bg)}>
+                <span className={cn("text-sm font-medium", avatarColors.text)}>{initials}</span>
               </div>
               <div className="grid gap-1">
                 {title && <ToastTitle className="font-bold text-black">{title}</ToastTitle>}
@@ -30,16 +39,16 @@ export function Toaster() {
                 )}
               </div>
             </div>
-            {action && typeof action === 'object' && (
+            {action && typeof action === 'object' && 'label' in action && (
               <ToastAction 
-                altText="View" 
+                altText={action.label || "View"} 
                 onClick={() => {
                   if ('onClick' in action && typeof action.onClick === 'function') {
                     action.onClick();
                   }
                 }}
               >
-                View
+                {action.label || "View"}
               </ToastAction>
             )}
             <ToastClose />

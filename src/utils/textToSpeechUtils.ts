@@ -70,7 +70,8 @@ export const speakText = async ({ text, voiceId = DEFAULT_VOICE_ID }: TextToSpee
     
     // Create AudioContext if it doesn't exist
     if (!audioContext) {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      // Fix: Use only standard AudioContext without the webkit prefix
+      audioContext = new AudioContext();
     }
     
     // Decode the audio data

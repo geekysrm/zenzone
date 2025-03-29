@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { MessageForSummary, summarizeMessages } from "@/utils/summaryUtils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sparkles } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface MessageSummaryProps {
   messages: MessageForSummary[];
@@ -60,12 +61,35 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
               </div>
             ) : (
               isGenerating ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <div className="animate-spin mb-2">
-                      <Sparkles className="h-6 w-6" />
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Skeleton className="h-5 w-5 rounded-full" />
+                    <Skeleton className="h-5 w-32" />
+                  </div>
+                  
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-[90%]" />
+                  <Skeleton className="h-4 w-[95%]" />
+                  
+                  <div className="pt-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-[92%] mt-1" />
+                    <Skeleton className="h-4 w-[85%] mt-1" />
+                  </div>
+                  
+                  <div className="pt-2">
+                    <Skeleton className="h-5 w-40" />
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-full" />
                     </div>
-                    <p>Generating summary...</p>
+                  </div>
+                  
+                  <div className="pt-2">
+                    <Skeleton className="h-5 w-36" />
+                    <Skeleton className="h-4 w-full mt-1" />
+                    <Skeleton className="h-4 w-[88%] mt-1" />
+                    <Skeleton className="h-4 w-[92%] mt-1" />
                   </div>
                 </div>
               ) : (

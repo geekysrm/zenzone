@@ -1,5 +1,7 @@
 
 import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import React from "react";
 
 type NotificationOptions = {
   channelName: string;
@@ -21,10 +23,11 @@ export const showMessageNotification = ({
     title: `New message in #${channelName}`,
     description: `${senderName}: ${messageContent}`,
     duration: 5000,
-    action: onClick ? {
-      label: "View",
-      onClick: onClick
-    } : undefined,
+    action: onClick ? (
+      <ToastAction altText="View message" onClick={onClick}>
+        View
+      </ToastAction>
+    ) : undefined,
   });
 
   // Also play notification sound if browser supports it

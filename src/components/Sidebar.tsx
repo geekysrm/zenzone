@@ -20,6 +20,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
+import { MessageForSummary } from "@/utils/summaryUtils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { summarizeMessages } from "@/utils/summaryUtils";
 
 interface SidebarProps {
@@ -39,6 +42,12 @@ export default function Sidebar({
 }: SidebarProps) {
   const { user, signOut } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  
+  // Add summary dialog state
+  const [summaryDialogOpen, setSummaryDialogOpen] = useState(false);
+  const [summaryContent, setSummaryContent] = useState<React.ReactNode | null>(null);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [currentSummaryChannel, setCurrentSummaryChannel] = useState<Channel | null>(null);
 
   const renderChannelIcon = useCallback((channel: Channel) => {
     if (channel.type === "direct") {
@@ -85,137 +94,199 @@ export default function Sidebar({
       return;
     }
     
-    // Show a loading toast
-    toast({
-      title: "Summarizing Unread Messages",
-      description: `Creating a summary for ${channel.unreadCount} unread messages in #${channel.name}...`,
-      duration: 2000,
-    });
+    // Open the dialog with loading state
+    setSummaryDialogOpen(true);
+    setIsGeneratingSummary(true);
+    setSummaryContent(null);
+    setCurrentSummaryChannel(channel);
     
-    // Call the summarize function with the channel info
-    summarizeMessages([], channel.name, channel.id, channel.unreadCount);
+    console.log("Generating summary for channel:", channel.name);
+    
+    // Generate summary with empty messages array (will be filled on the backend)
+    const dummyMessages: MessageForSummary[] = [];
+    const summaryContent = summarizeMessages(dummyMessages, channel.name, channel.id, channel.unreadCount);
+    
+    // Set the summary content after a short delay to ensure dialog is rendered
+    setTimeout(() => {
+      setSummaryContent(summaryContent);
+      setIsGeneratingSummary(false);
+    }, 100);
   };
 
   return (
-    <div className="flex flex-col h-screen bg-slack-purple text-white w-64 flex-shrink-0 overflow-y-auto">
-      <div className="p-3 flex items-center justify-between border-b border-slack-divider">
-        <div className="flex items-center space-x-2">
-          <img src={workspaceLogo} alt={workspaceName} className="w-8 h-8 rounded" />
-          <h1 className="font-semibold text-lg">{workspaceName}</h1>
-        </div>
-        <ChevronDown size={16} />
-      </div>
-
-      <div className="mt-4 flex-1">
-        {sections.map((section) => (
-          <div key={section.id} className="mb-4">
-            <h2 className="px-4 mb-1 text-slack-gray text-sm uppercase">
-              {section.title}
-            </h2>
-            <ul>
-              {section.items.map((channel) => (
-                <li key={channel.id}>
-                  <div className="group relative">
-                    <button
-                      onClick={() => onChannelSelect(channel)}
-                      className={cn(
-                        "flex items-center w-full px-4 py-1 text-left",
-                        activeChannel.id === channel.id ? "bg-slack-highlight text-white" : "text-slack-gray hover:bg-gray-800"
-                      )}
-                    >
-                      <span className="mr-2">{renderChannelIcon(channel)}</span>
-                      <span className="flex-1 truncate">{channel.name}</span>
-                      {channel.unreadCount > 0 && (
-                        <span className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                          {channel.unreadCount}
-                        </span>
-                      )}
-                    </button>
-                    
-                    {/* Sparkle icon with tooltip */}
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button 
-                            onClick={(e) => handleSummarizeChannel(e, channel)}
-                            className={cn(
-                              "absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity",
-                              "focus:opacity-100 focus:outline-none"
-                            )}
-                            aria-label="Summarize unread messages"
-                          >
-                            <Sparkles size={14} />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right">
-                          <p className="text-xs">Summarize Unread</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </li>
-              ))}
-              {section.id === "channels" && (
-                <li>
-                  <button
-                    className="flex items-center w-full px-4 py-1 text-left text-slack-gray hover:bg-gray-800"
-                  >
-                    <span className="mr-2"><Plus size={16} /></span>
-                    <span className="flex-1">Add channels</span>
-                  </button>
-                </li>
-              )}
-            </ul>
+    <>
+      <div className="flex flex-col h-screen bg-slack-purple text-white w-64 flex-shrink-0 overflow-y-auto">
+        <div className="p-3 flex items-center justify-between border-b border-slack-divider">
+          <div className="flex items-center space-x-2">
+            <img src={workspaceLogo} alt={workspaceName} className="w-8 h-8 rounded" />
+            <h1 className="font-semibold text-lg">{workspaceName}</h1>
           </div>
-        ))}
-      </div>
+          <ChevronDown size={16} />
+        </div>
 
-      <div className="p-3 mt-auto border-t border-slack-divider">
-        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center space-x-2 w-full hover:bg-gray-800 p-2 rounded cursor-pointer">
-              <div className="relative">
-                {user?.user_metadata?.avatar_url ? (
-                  <img
-                    src={user.user_metadata.avatar_url}
-                    alt="Your avatar"
-                    className="w-8 h-8 rounded"
-                  />
-                ) : (
-                  <img
-                    src={avatarUrl}
-                    alt="Your avatar"
-                    className="w-8 h-8 rounded"
-                  />
+        <div className="mt-4 flex-1">
+          {sections.map((section) => (
+            <div key={section.id} className="mb-4">
+              <h2 className="px-4 mb-1 text-slack-gray text-sm uppercase">
+                {section.title}
+              </h2>
+              <ul>
+                {section.items.map((channel) => (
+                  <li key={channel.id}>
+                    <div className="group relative">
+                      <button
+                        onClick={() => onChannelSelect(channel)}
+                        className={cn(
+                          "flex items-center w-full px-4 py-1 text-left",
+                          activeChannel.id === channel.id ? "bg-slack-highlight text-white" : "text-slack-gray hover:bg-gray-800"
+                        )}
+                      >
+                        <span className="mr-2">{renderChannelIcon(channel)}</span>
+                        <span className="flex-1 truncate">{channel.name}</span>
+                        {channel.unreadCount > 0 && (
+                          <span className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                            {channel.unreadCount}
+                          </span>
+                        )}
+                      </button>
+                      
+                      {/* Sparkle icon with tooltip for summarization */}
+                      {channel.unreadCount > 0 && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button 
+                                onClick={(e) => handleSummarizeChannel(e, channel)}
+                                className={cn(
+                                  "absolute right-10 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white",
+                                  "focus:opacity-100 focus:outline-none z-10",
+                                  activeChannel.id === channel.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                                )}
+                                aria-label="Summarize unread messages"
+                              >
+                                <Sparkles size={14} />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="right">
+                              <p className="text-xs">Summarize Unread</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                    </div>
+                  </li>
+                ))}
+                {section.id === "channels" && (
+                  <li>
+                    <button
+                      className="flex items-center w-full px-4 py-1 text-left text-slack-gray hover:bg-gray-800"
+                    >
+                      <span className="mr-2"><Plus size={16} /></span>
+                      <span className="flex-1">Add channels</span>
+                    </button>
+                  </li>
                 )}
-                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slack-purple rounded-full"></span>
-              </div>
-              <span className="text-sm font-medium flex-1 text-left">{userName}</span>
-              <ChevronDown size={16} />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            side="top" 
-            align="start" 
-            className="w-56 bg-slack-purple text-white border-slack-divider"
-          >
-            <DropdownMenuItem className="text-sm cursor-pointer hover:bg-gray-800">
-              Profile & Account
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-sm cursor-pointer hover:bg-gray-800">
-              Preferences
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-slack-divider" />
-            <DropdownMenuItem 
-              onClick={handleSignOut}
-              className="text-sm cursor-pointer hover:bg-gray-800 focus:bg-gray-800 text-red-400"
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="p-3 mt-auto border-t border-slack-divider">
+          <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center space-x-2 w-full hover:bg-gray-800 p-2 rounded cursor-pointer">
+                <div className="relative">
+                  {user?.user_metadata?.avatar_url ? (
+                    <img
+                      src={user.user_metadata.avatar_url}
+                      alt="Your avatar"
+                      className="w-8 h-8 rounded"
+                    />
+                  ) : (
+                    <img
+                      src={avatarUrl}
+                      alt="Your avatar"
+                      className="w-8 h-8 rounded"
+                    />
+                  )}
+                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slack-purple rounded-full"></span>
+                </div>
+                <span className="text-sm font-medium flex-1 text-left">{userName}</span>
+                <ChevronDown size={16} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              side="top" 
+              align="start" 
+              className="w-56 bg-slack-purple text-white border-slack-divider"
             >
-              <LogOut size={16} className="mr-2" />
-              Sign Out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <DropdownMenuItem className="text-sm cursor-pointer hover:bg-gray-800">
+                Profile & Account
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-sm cursor-pointer hover:bg-gray-800">
+                Preferences
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-slack-divider" />
+              <DropdownMenuItem 
+                onClick={handleSignOut}
+                className="text-sm cursor-pointer hover:bg-gray-800 focus:bg-gray-800 text-red-400"
+              >
+                <LogOut size={16} className="mr-2" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
-    </div>
+      
+      {/* Summary Dialog */}
+      <Dialog open={summaryDialogOpen} onOpenChange={setSummaryDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>
+              {currentSummaryChannel && `Unread Messages Summary for #${currentSummaryChannel.name}`}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="min-h-[200px] max-h-[400px] overflow-y-auto border rounded-md p-4 bg-gray-50">
+              {summaryContent ? (
+                <div className="prose prose-sm max-w-none">
+                  {summaryContent}
+                </div>
+              ) : (
+                isGeneratingSummary ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    
+                    <div className="pt-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-5/6" />
+                    </div>
+                    
+                    <div className="pt-2">
+                      <Skeleton className="h-4 w-4/5" />
+                      <Skeleton className="h-4 w-2/3" />
+                      <Skeleton className="h-4 w-full" />
+                    </div>
+                    
+                    <div className="pt-2">
+                      <Skeleton className="h-4 w-11/12" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                  </div>
+                ) : (
+                  currentSummaryChannel && currentSummaryChannel.unreadCount > 0
+                    ? "Creating summary of unread messages..." 
+                    : "No unread messages to summarize."
+                )
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

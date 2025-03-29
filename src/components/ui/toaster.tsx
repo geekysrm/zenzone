@@ -32,10 +32,10 @@ export function Toaster() {
             </div>
             {action && (
               <ToastAction 
-                altText={action.altText as string}
-                onClick={action.onClick as () => void}
+                altText={action.altText}
+                onClick={action.onClick}
               >
-                {action.children as React.ReactNode}
+                {action.children}
               </ToastAction>
             )}
             <ToastClose />

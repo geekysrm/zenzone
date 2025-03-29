@@ -5,7 +5,7 @@ import { Channel, Message } from "@/types/chat";
 import { mockCurrentChannel, mockSections } from "@/data/mockData";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { showBroadcastNotification } from "@/utils/notificationUtils";
+import { showMessageNotification } from "@/utils/notificationUtils";
 
 const Index = () => {
   const [activeChannel, setActiveChannel] = useState<Channel>(mockCurrentChannel);
@@ -61,29 +61,29 @@ const Index = () => {
     };
   }, [activeChannel.id, user]);
   
-  // Listen for broadcast messages in all channels
+  // Listen for messages in all channels
   useEffect(() => {
     if (!user) return;
     
-    // Subscribe to all channel broadcast events
+    // Subscribe to all channels
     const allChannels = sections.flatMap(section => section.items);
     
-    const broadcastSubscriptions = allChannels.map(channel => {
+    const messageSubscriptions = allChannels.map(channel => {
+      // Skip the active channel (user is already viewing it)
+      if (channel.id === activeChannel.id) return null;
+      
       return supabase
-        .channel(`broadcast:${channel.id}`)
+        .channel(`message:${channel.id}`)
         .on('broadcast', { event: 'message' }, (payload) => {
           // Skip notifications for messages sent by the current user
           if (payload.payload.sender_id === user.id) return;
-          
-          // Skip notifications for the active channel (user is already viewing it)
-          if (channel.id === activeChannel.id) return;
           
           // Find the channel to navigate to
           const targetChannel = allChannels.find(c => c.id === channel.id);
           if (!targetChannel) return;
           
-          // Show broadcast notification with click handler to navigate to channel
-          showBroadcastNotification({
+          // Show notification with click handler to navigate to channel
+          showMessageNotification({
             channelName: payload.payload.channel_name,
             senderName: payload.payload.sender_name,
             messageContent: payload.payload.message,
@@ -91,11 +91,13 @@ const Index = () => {
           });
         })
         .subscribe();
-    });
+        
+      return messageSubscriptions;
+    }).filter(Boolean);
     
     return () => {
-      broadcastSubscriptions.forEach(subscription => {
-        supabase.removeChannel(subscription);
+      messageSubscriptions.forEach(subscription => {
+        if (subscription) supabase.removeChannel(subscription);
       });
     };
   }, [sections, activeChannel.id, user]);

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import ChannelHeader from "./ChannelHeader";
@@ -8,7 +7,7 @@ import { Channel, Message, Attachment } from "@/types/chat";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import { showMessageNotification, showBroadcastNotification } from "@/utils/notificationUtils";
+import { showMessageNotification } from "@/utils/notificationUtils";
 
 interface ChatLayoutProps {
   sections: any[];

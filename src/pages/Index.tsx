@@ -1,39 +1,21 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ChatLayout from "@/components/ChatLayout";
 import { Channel } from "@/types/chat";
-import { mockCurrentChannel, mockSections, mockUsers } from "@/data/mockData";
+import { mockCurrentChannel, mockSections } from "@/data/mockData";
 import { useAuth } from "@/context/AuthContext";
-import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [activeChannel, setActiveChannel] = useState<Channel>(mockCurrentChannel);
   const [messages, setMessages] = useState([]);
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   
   const handleChannelSelect = (channel: Channel) => {
     setActiveChannel(channel);
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-  };
-
   return (
     <div className="h-screen overflow-hidden">
-      <div className="absolute top-4 right-4 z-50">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleSignOut}
-          className="flex items-center gap-2"
-        >
-          <LogOut size={16} />
-          Sign Out
-        </Button>
-      </div>
       <ChatLayout
         sections={mockSections}
         activeChannel={activeChannel}

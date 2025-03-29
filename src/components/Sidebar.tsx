@@ -1,8 +1,17 @@
 
 import { Channel, Section } from "@/types/chat";
 import { cn } from "@/lib/utils";
-import { useCallback } from "react";
-import { ChevronDown, Hash, Lock, Plus, User } from "lucide-react";
+import { useCallback, useState } from "react";
+import { ChevronDown, Hash, Lock, LogOut, Plus, User } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "@/components/ui/use-toast";
 
 interface SidebarProps {
   sections: Section[];
@@ -19,6 +28,9 @@ export default function Sidebar({
   workspaceLogo,
   onChannelSelect,
 }: SidebarProps) {
+  const { user, signOut } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   const renderChannelIcon = useCallback((channel: Channel) => {
     if (channel.type === "direct") {
       return <User size={16} />;
@@ -26,6 +38,23 @@ export default function Sidebar({
       return channel.isPrivate ? <Lock size={16} /> : <Hash size={16} />;
     }
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out",
+        description: "You have been signed out successfully",
+      });
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen bg-slack-purple text-white w-64 flex-shrink-0 overflow-y-auto">
@@ -79,17 +108,42 @@ export default function Sidebar({
       </div>
 
       <div className="p-3 mt-auto border-t border-slack-divider">
-        <div className="flex items-center space-x-2">
-          <div className="relative">
-            <img
-              src="https://i.pravatar.cc/150?img=3" 
-              alt="Your avatar"
-              className="w-8 h-8 rounded"
-            />
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slack-purple rounded-full"></span>
-          </div>
-          <span className="text-sm font-medium">You</span>
-        </div>
+        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center space-x-2 w-full hover:bg-gray-800 p-2 rounded cursor-pointer">
+              <div className="relative">
+                <img
+                  src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/150?img=3"} 
+                  alt="Your avatar"
+                  className="w-8 h-8 rounded"
+                />
+                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slack-purple rounded-full"></span>
+              </div>
+              <span className="text-sm font-medium flex-1 text-left">{user?.user_metadata?.name || "You"}</span>
+              <ChevronDown size={16} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            side="top" 
+            align="start" 
+            className="w-56 bg-slack-purple text-white border-slack-divider"
+          >
+            <DropdownMenuItem className="text-sm cursor-pointer hover:bg-gray-800">
+              Profile & Account
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-sm cursor-pointer hover:bg-gray-800">
+              Preferences
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-slack-divider" />
+            <DropdownMenuItem 
+              onClick={handleSignOut}
+              className="text-sm cursor-pointer hover:bg-gray-800 focus:bg-gray-800 text-red-400"
+            >
+              <LogOut size={16} className="mr-2" />
+              Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

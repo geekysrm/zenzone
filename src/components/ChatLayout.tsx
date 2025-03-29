@@ -59,10 +59,10 @@ export default function ChatLayout({
               avatar: user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User&background=random',
             },
             isEvent: msg.is_event || false,
-            eventDetails: msg.event_details ? {
-              type: msg.event_details.type || 'generic',
-              details: msg.event_details.details || '',
-              time: msg.event_details.time || undefined
+            eventDetails: msg.event_details && typeof msg.event_details === 'object' ? {
+              type: (msg.event_details as any).type || 'generic',
+              details: (msg.event_details as any).details || '',
+              time: (msg.event_details as any).time || undefined
             } : undefined,
             attachments: msg.attachments ? 
               Array.isArray(msg.attachments) ? 
@@ -111,10 +111,10 @@ export default function ChatLayout({
                 avatar: user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User&background=random',
               },
               isEvent: newMessage.is_event || false,
-              eventDetails: newMessage.event_details ? {
-                type: newMessage.event_details.type || 'generic',
-                details: newMessage.event_details.details || '',
-                time: newMessage.event_details.time || undefined
+              eventDetails: newMessage.event_details && typeof newMessage.event_details === 'object' ? {
+                type: (newMessage.event_details as any).type || 'generic',
+                details: (newMessage.event_details as any).details || '',
+                time: (newMessage.event_details as any).time || undefined
               } : undefined,
               attachments: newMessage.attachments ? 
                 Array.isArray(newMessage.attachments) ? 

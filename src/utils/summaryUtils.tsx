@@ -67,11 +67,11 @@ export function summarizeMessages(
   (async () => {
     try {
       // Get the API key from Supabase
-      const { data } = await supabase.functions.invoke("get-api-key", {
+      const { data: supabaseData } = await supabase.functions.invoke("get-api-key", {
         body: { key: "AI_API_KEY" }
       });
       
-      const apiKey = data?.apiKey;
+      const apiKey = supabaseData?.apiKey;
       
       if (!apiKey) {
         throw new Error("Failed to retrieve API key from Supabase");

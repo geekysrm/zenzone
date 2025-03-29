@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageForSummary, summarizeMessages } from "@/utils/summaryUtils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Sparkles } from "lucide-react";
 
 interface MessageSummaryProps {
   messages: MessageForSummary[];
@@ -21,6 +22,7 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
+          <Sparkles className="h-4 w-4 mr-2" />
           Summarize Unread
         </Button>
       </DialogTrigger>
@@ -35,6 +37,7 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
           </div>
           <div className="flex justify-end">
             <Button onClick={handleGenerateSummary}>
+              <Sparkles className="h-4 w-4 mr-2" />
               Generate Summary
             </Button>
           </div>

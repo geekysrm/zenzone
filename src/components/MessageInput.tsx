@@ -1,6 +1,5 @@
-
 import { AtSign, Bold, Italic, Mic, Paperclip, Send, Smile } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, KeyboardEvent } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +25,14 @@ export default function MessageInput({ channelName, onSendMessage }: MessageInpu
       } finally {
         setIsSubmitting(false);
       }
+    }
+  };
+
+  // Handle key press events (Enter to send, Shift+Enter for new line)
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // Prevent default to avoid newline
+      handleSubmit(e as unknown as FormEvent);
     }
   };
 
@@ -73,6 +80,7 @@ export default function MessageInput({ channelName, onSendMessage }: MessageInpu
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder={`Message #${channelName}`}
             className="w-full rounded-md pr-24 focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[80px]"
             disabled={isSubmitting}
@@ -116,7 +124,7 @@ export default function MessageInput({ channelName, onSendMessage }: MessageInpu
           Format with <span className="font-mono">Markdown</span> - <span className="italic">*italic*</span>, <span className="font-bold">**bold**</span>, <code className="bg-gray-100 px-1">`code`</code>
         </div>
         <div>
-          Ctrl+Enter to send
+          Press Enter to send, Shift+Enter for new line
         </div>
       </div>
     </div>

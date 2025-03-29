@@ -1,4 +1,3 @@
-
 import { Channel, Section } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
@@ -239,12 +238,12 @@ export default function Sidebar({
         </div>
       </div>
       
-      {/* Summary Dialog - updating title text here */}
+      {/* Summary Dialog - update title text here */}
       <Dialog open={summaryDialogOpen} onOpenChange={setSummaryDialogOpen}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>
-              {currentSummaryChannel && `Unread Messages Summary for #${currentSummaryChannel.name}`}
+              {currentSummaryChannel && `Recent Messages Summary for #${currentSummaryChannel.name}`}
             </DialogTitle>
           </DialogHeader>
           

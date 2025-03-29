@@ -40,6 +40,7 @@ export default function MessageSummary({
       setIsGenerating(true);
       const summaryUI = summarizeMessages(messages, channelName, channelId, unreadCount);
       setSummary(summaryUI);
+      setIsGenerating(false); // This line is added to ensure isGenerating is reset
     }
   };
   

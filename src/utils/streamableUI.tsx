@@ -30,13 +30,24 @@ export function createStreamableUI(): StreamableUI {
       };
     }, []);
     
+    // If there's no content, return null instead of an empty fragment
+    if (content.length === 0) return null;
+    
     return <>{content}</>;
   };
   
   return {
     value: <StreamComponent />,
     append: (newContent: React.ReactNode) => {
-      content = [...content, newContent];
+      if (isDone) return; // Don't append after done
+      
+      // For single content replacement
+      if (newContent === null) {
+        content = [];
+      } else {
+        content = [...content, newContent];
+      }
+      
       // Notify all registered components to update
       updateCallbacks.forEach(callback => callback());
     },

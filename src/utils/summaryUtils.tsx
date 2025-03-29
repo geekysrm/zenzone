@@ -32,6 +32,7 @@ function renderMarkdown(text: string): string {
   // Lists
   formatted = formatted.replace(/^\- (.*?)$/gm, '<li>$1</li>');
   formatted = formatted.replace(/^\* (.*?)$/gm, '<li>$1</li>');
+  formatted = formatted.replace(/<li>.*?<\/li>/gs, match => `<ul>${match}</ul>`);
   
   // Links
   formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-600 hover:underline">$1</a>');
@@ -125,6 +126,7 @@ export function summarizeMessages(
             No messages to summarize. The channel might be empty or the messages cannot be retrieved.
           </div>
         );
+        streamable.done();
         return;
       }
       
@@ -152,6 +154,13 @@ Format your response with Markdown:
 
 Keep the summary brief but informative.
       `;
+      
+      // Initial UI feedback
+      streamable.append(
+        <div className="text-gray-600">
+          Summarizing {unreadMessages.length} messages from #{channelName}...
+        </div>
+      );
       
       // Call the OpenAI API
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -185,6 +194,9 @@ Keep the summary brief but informative.
       const responseData = await response.json();
       const summary = responseData.choices[0].message.content;
       
+      // Clear initial feedback
+      streamable.value = null;
+      
       // Append the summary with markdown formatting
       streamable.append(
         <div 
@@ -202,7 +214,9 @@ Keep the summary brief but informative.
       
     } catch (error) {
       console.error("Error during summarization:", error);
-      streamable.append(<div className="text-red-500">Error generating summary: {error.message}</div>);
+      streamable.append(
+        <div className="text-red-500">Error generating summary: {error.message}</div>
+      );
       
       toast({
         title: "Summarization Failed",

@@ -1,7 +1,8 @@
+
 import { Channel, Section } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
-import { ChevronDown, Hash, Lock, LogOut, Plus, User } from "lucide-react";
+import { ChevronDown, Hash, Lock, LogOut, Plus, User, Sparkles } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
   DropdownMenu,
@@ -12,6 +13,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 import { getInitials } from "@/utils/avatarUtils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   sections: Section[];
@@ -63,6 +71,19 @@ export default function Sidebar({
   const userEmail = user?.email || "";
   const avatarUrl =  `https://i.pravatar.cc/150?u=${user?.id || "anonymous"}`;
 
+  const handleSummarizeChannel = (e: React.MouseEvent, channel: Channel) => {
+    e.stopPropagation(); // Prevent triggering channel selection
+    
+    // Here you can add logic to handle summarization for the specific channel
+    console.log(`Summarize unread messages for ${channel.name}`);
+    
+    // Show a toast notification (this is just a placeholder)
+    toast({
+      title: "Summarizing Messages",
+      description: `Creating a summary for #${channel.name}...`,
+    });
+  };
+
   return (
     <div className="flex flex-col h-screen bg-slack-purple text-white w-64 flex-shrink-0 overflow-y-auto">
       <div className="p-3 flex items-center justify-between border-b border-slack-divider">
@@ -82,21 +103,44 @@ export default function Sidebar({
             <ul>
               {section.items.map((channel) => (
                 <li key={channel.id}>
-                  <button
-                    onClick={() => onChannelSelect(channel)}
-                    className={cn(
-                      "flex items-center w-full px-4 py-1 text-left",
-                      activeChannel.id === channel.id ? "bg-slack-highlight text-white" : "text-slack-gray hover:bg-gray-800"
-                    )}
-                  >
-                    <span className="mr-2">{renderChannelIcon(channel)}</span>
-                    <span className="flex-1 truncate">{channel.name}</span>
-                    {channel.unreadCount > 0 && (
-                      <span className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                        {channel.unreadCount}
-                      </span>
-                    )}
-                  </button>
+                  <div className="group relative">
+                    <button
+                      onClick={() => onChannelSelect(channel)}
+                      className={cn(
+                        "flex items-center w-full px-4 py-1 text-left",
+                        activeChannel.id === channel.id ? "bg-slack-highlight text-white" : "text-slack-gray hover:bg-gray-800"
+                      )}
+                    >
+                      <span className="mr-2">{renderChannelIcon(channel)}</span>
+                      <span className="flex-1 truncate">{channel.name}</span>
+                      {channel.unreadCount > 0 && (
+                        <span className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                          {channel.unreadCount}
+                        </span>
+                      )}
+                    </button>
+                    
+                    {/* Sparkle icon with tooltip */}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            onClick={(e) => handleSummarizeChannel(e, channel)}
+                            className={cn(
+                              "absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity",
+                              "focus:opacity-100 focus:outline-none"
+                            )}
+                            aria-label="Summarize unread messages"
+                          >
+                            <Sparkles size={14} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <p className="text-xs">Summarize Unread</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </li>
               ))}
               {section.id === "channels" && (

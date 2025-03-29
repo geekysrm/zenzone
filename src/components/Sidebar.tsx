@@ -1,4 +1,3 @@
-
 import { Channel, Section } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
@@ -62,7 +61,7 @@ export default function Sidebar({
   const userInitials = getInitials(userName);
   // Generate avatar URL using email or ID
   const userEmail = user?.email || "";
-  const avatarUrl = userEmail ? `https://i.pravatar.cc/150?u=${userEmail}` : `https://i.pravatar.cc/150?u=${user?.id || "anonymous"}`;
+  const avatarUrl =  `https://i.pravatar.cc/150?u=${user?.id || "anonymous"}`;
 
   return (
     <div className="flex flex-col h-screen bg-slack-purple text-white w-64 flex-shrink-0 overflow-y-auto">

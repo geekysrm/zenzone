@@ -1,6 +1,5 @@
 
 import { toast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 
 export function showMessageNotification({
   channelName,

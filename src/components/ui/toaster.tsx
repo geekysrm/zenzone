@@ -28,10 +28,14 @@ export function Toaster() {
             </div>
             {action && (
               <ToastAction 
-                altText={action.altText}
-                onClick={action.onClick}
+                altText="Action"
+                onClick={() => {
+                  if (typeof action === 'object' && action.onClick) {
+                    action.onClick();
+                  }
+                }}
               >
-                {action.label}
+                {typeof action === 'object' && action.label ? action.label : 'Action'}
               </ToastAction>
             )}
           </Toast>

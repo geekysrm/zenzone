@@ -125,7 +125,7 @@ const Index = () => {
         sections={sections}
         activeChannel={activeChannel}
         messages={messages}
-        workspaceName={user?.user_metadata?.name || "Acme Inc"}
+        workspaceName="Lovable"
         workspaceLogo="https://lovable.dev/icon.svg"
         setActiveChannel={handleChannelSelect}
       />

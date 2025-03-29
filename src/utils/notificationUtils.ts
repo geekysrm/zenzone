@@ -23,7 +23,6 @@ export function showMessageNotification({
       description: messageContent,
       action: {
         label: "View",
-        altText: "View message",
         onClick: onClick
       },
       duration: 5000,

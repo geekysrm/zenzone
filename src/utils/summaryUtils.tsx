@@ -1,10 +1,10 @@
 
 import React from "react";
-import { createStreamableUI } from "ai/rsc";
+import { createStreamableUI, StreamableUI } from "@/utils/streamableUI";
 import { toast } from "@/components/ui/use-toast";
 
 // This will store any ongoing summarization tasks
-let activeSummarization: ReturnType<typeof createStreamableUI> | null = null;
+let activeSummarization: StreamableUI | null = null;
 
 export type MessageForSummary = {
   senderName: string;

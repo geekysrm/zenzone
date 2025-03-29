@@ -23,6 +23,7 @@ export const showMessageNotification = ({
     duration: 5000,
     action: onClick ? {
       onClick: onClick,
+      altText: "View"
     } : undefined,
   });
 

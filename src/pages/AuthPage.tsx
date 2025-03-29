@@ -5,7 +5,6 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Mail, Lock, UserPlus } from "lucide-react";
 import { 
@@ -19,6 +18,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { generateRandomName } from "@/utils/nameGenerator";
 
 const authSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -45,17 +45,25 @@ const AuthPage = () => {
       setIsSubmitting(true);
       
       if (isSignUp) {
-        // Sign up
+        // Generate a random name for new user
+        const generatedName = generateRandomName();
+        
+        // Sign up with the generated name in user metadata
         const { error } = await supabase.auth.signUp({
           email: values.email,
           password: values.password,
+          options: {
+            data: {
+              name: generatedName
+            }
+          }
         });
 
         if (error) throw error;
         
         toast({
           title: "Account created",
-          description: "Please check your email to verify your account",
+          description: `Welcome, ${generatedName}! Please check your email to verify your account.`,
         });
       } else {
         // Sign in

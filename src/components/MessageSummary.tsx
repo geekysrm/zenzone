@@ -11,7 +11,8 @@ interface MessageSummaryProps {
   channelName: string;
   channelId?: string;
   unreadCount?: number;
-  buttonText?: string; // New prop for custom button text
+  buttonText?: string;
+  summaryMode?: 'unread' | 'recent'; // New prop for summary mode
 }
 
 export default function MessageSummary({ 
@@ -19,7 +20,8 @@ export default function MessageSummary({
   channelName,
   channelId,
   unreadCount = 0,
-  buttonText = "Summarize Unread" // Default is still "Summarize Unread"
+  buttonText = "Summarize Unread",
+  summaryMode = 'unread' // Default to unread mode
 }: MessageSummaryProps) {
   const [summary, setSummary] = useState<React.ReactNode | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -37,12 +39,18 @@ export default function MessageSummary({
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     
-    // If opening the dialog and we have messages, generate summary
-    if (open && hasMessages && !summary) {
+    // If opening the dialog, generate summary based on the mode
+    if (open) {
       setIsGenerating(true);
-      const summaryUI = summarizeMessages(messages, channelName, channelId, unreadCount);
+      const summaryUI = summarizeMessages(
+        messages, 
+        channelName, 
+        channelId, 
+        summaryMode === 'unread' ? unreadCount : 20, // Use unreadCount for unread mode, or 20 for recent mode
+        summaryMode
+      );
       setSummary(summaryUI);
-      setIsGenerating(false); // This line is added to ensure isGenerating is reset
+      setIsGenerating(false);
     }
   };
   
@@ -52,7 +60,6 @@ export default function MessageSummary({
         <Button 
           variant="outline" 
           size="sm"
-          // Removed the disabled prop to always show the button as active
         >
           <Sparkles className="h-4 w-4 mr-2" />
           {buttonText}
@@ -60,7 +67,11 @@ export default function MessageSummary({
       </DialogTrigger>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Unread Messages Summary for #{channelName}</DialogTitle>
+          <DialogTitle>
+            {summaryMode === 'unread' 
+              ? `Unread Messages Summary for #${channelName}` 
+              : `Recent Messages Summary for #${channelName}`}
+          </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
@@ -93,9 +104,11 @@ export default function MessageSummary({
                   </div>
                 </div>
               ) : (
-                hasMessages 
-                  ? "Click to create a summary of unread messages." 
-                  : "No unread messages to summarize."
+                summaryMode === 'unread'
+                  ? (hasMessages 
+                      ? "Click to create a summary of unread messages."
+                      : "No unread messages to summarize.")
+                  : "Click to create a summary of recent messages."
               )
             )}
           </div>

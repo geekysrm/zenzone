@@ -1,4 +1,3 @@
-
 import React from "react";
 import { createStreamableUI, StreamableUI } from "@/utils/streamableUI";
 import { toast } from "@/components/ui/use-toast";
@@ -47,7 +46,8 @@ export function summarizeMessages(
   messages: MessageForSummary[],
   channelName: string,
   channelId?: string,
-  unreadCount?: number
+  messageCount?: number,
+  mode: 'unread' | 'recent' = 'unread'
 ) {
   // Cancel any existing summarization
   if (activeSummarization) {
@@ -73,17 +73,25 @@ export function summarizeMessages(
         throw new Error("Failed to retrieve API key from Supabase");
       }
       
-      // If we have a channelId and unreadCount, fetch the unread messages from the database
-      let unreadMessages: MessageForSummary[] = messages;
+      // If we have a channelId and messageCount, fetch the messages from the database
+      let messagesToSummarize: MessageForSummary[] = messages;
       
-      if (channelId && unreadCount && unreadCount > 0) {
-        // Fetch the most recent 'unreadCount' messages for the channel
-        const { data: messageData, error: messageError } = await supabase
+      if (channelId && messageCount && messageCount > 0) {
+        // The query will be different based on the mode
+        let query = supabase
           .from('messages')
           .select('content, timestamp, user_id')
-          .eq('channel_id', channelId)
-          .order('timestamp', { ascending: false })
-          .limit(unreadCount);
+          .eq('channel_id', channelId);
+          
+        if (mode === 'recent') {
+          // For recent mode, get the most recent messages
+          query = query.order('timestamp', { ascending: false }).limit(messageCount);
+        } else if (mode === 'unread') {
+          // For unread mode, the logic remains the same (gets the most recent unread messages)
+          query = query.order('timestamp', { ascending: false }).limit(messageCount);
+        }
+          
+        const { data: messageData, error: messageError } = await query;
           
         if (messageError) {
           throw new Error(`Error fetching messages: ${messageError.message}`);
@@ -112,7 +120,7 @@ export function summarizeMessages(
           }
           
           // Transform the message data into the correct format
-          unreadMessages = messageData.map(msg => ({
+          messagesToSummarize = messageData.map(msg => ({
             senderName: userMap.get(msg.user_id) || 'Unknown User',
             content: msg.content,
             timestamp: msg.timestamp
@@ -120,10 +128,12 @@ export function summarizeMessages(
         }
       }
       
-      if (unreadMessages.length === 0) {
+      if (messagesToSummarize.length === 0) {
         streamable.append(
           <div className="text-gray-500 italic">
-            No messages to summarize. The channel might be empty or the messages cannot be retrieved.
+            {mode === 'unread' 
+              ? "No unread messages to summarize. The channel might be empty or all messages have been read."
+              : "No recent messages to summarize. The channel might be empty."}
           </div>
         );
         streamable.done();
@@ -131,13 +141,13 @@ export function summarizeMessages(
       }
       
       // Format messages for the prompt
-      const formattedMessages = unreadMessages.map(msg => 
+      const formattedMessages = messagesToSummarize.map(msg => 
         `${new Date(msg.timestamp).toLocaleTimeString()} - ${msg.senderName}: ${msg.content}`
       ).join('\n');
       
       // Create the prompt for OpenAI
       const prompt = `
-Here are the unread messages from a channel named #${channelName} that I missed:
+Here are the ${mode === 'unread' ? 'unread' : 'recent'} messages from a channel named #${channelName} ${mode === 'unread' ? 'that I missed' : ''}:
 
 ${formattedMessages}
 
@@ -158,7 +168,7 @@ Keep the summary brief but informative.
       // Initial UI feedback
       streamable.append(
         <div className="text-gray-600">
-          Summarizing {unreadMessages.length} messages from #{channelName}...
+          Summarizing {messagesToSummarize.length} {mode === 'unread' ? 'unread' : 'recent'} messages from #{channelName}...
         </div>
       );
       
@@ -208,7 +218,7 @@ Keep the summary brief but informative.
       // Show success toast
       toast({
         title: "Summary Complete",
-        description: `Summary of unread messages in #${channelName} is ready.`,
+        description: `Summary of ${mode === 'unread' ? 'unread' : 'recent'} messages in #${channelName} is ready.`,
         duration: 3000,
       });
       

@@ -56,6 +56,7 @@ export default function ChannelHeader({ channel, topic, participantCount }: Chan
           channelId={channel.id}
           unreadCount={channel.unreadCount}
           buttonText="Summarize Recent"
+          summaryMode="recent"
         />
       </div>
     </div>

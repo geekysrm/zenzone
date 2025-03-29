@@ -1,15 +1,16 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ChatLayout from "@/components/ChatLayout";
 import { Channel } from "@/types/chat";
-import { mockCurrentChannel, mockMessages, mockSections, mockUsers } from "@/data/mockData";
+import { mockCurrentChannel, mockSections, mockUsers } from "@/data/mockData";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [activeChannel, setActiveChannel] = useState<Channel>(mockCurrentChannel);
-  const messages = mockMessages[activeChannel.id] || [];
+  const [messages, setMessages] = useState([]);
   const { user, signOut } = useAuth();
   
   const handleChannelSelect = (channel: Channel) => {

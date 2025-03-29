@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      messages: {
+        Row: {
+          attachments: Json | null
+          channel_id: string
+          content: string
+          event_details: Json | null
+          event_type: string | null
+          id: string
+          is_event: boolean | null
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          channel_id: string
+          content: string
+          event_details?: Json | null
+          event_type?: string | null
+          id?: string
+          is_event?: boolean | null
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          channel_id?: string
+          content?: string
+          event_details?: Json | null
+          event_type?: string | null
+          id?: string
+          is_event?: boolean | null
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

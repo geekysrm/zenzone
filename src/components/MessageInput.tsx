@@ -9,12 +9,20 @@ interface MessageInputProps {
 
 export default function MessageInput({ channelName, onSendMessage }: MessageInputProps) {
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (message.trim()) {
-      onSendMessage(message);
-      setMessage("");
+    if (message.trim() && !isSubmitting) {
+      try {
+        setIsSubmitting(true);
+        await onSendMessage(message);
+        setMessage("");
+      } catch (error) {
+        console.error('Error in message submission:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -27,6 +35,7 @@ export default function MessageInput({ channelName, onSendMessage }: MessageInpu
           onChange={(e) => setMessage(e.target.value)}
           placeholder={`Message #${channelName}`}
           className="w-full border rounded-md px-4 py-2 pr-24 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          disabled={isSubmitting}
         />
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
           <button type="button" className="text-gray-500 hover:text-gray-800 p-1">

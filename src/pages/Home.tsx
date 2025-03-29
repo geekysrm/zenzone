@@ -34,7 +34,7 @@ const Home = () => {
         <div className="container mx-auto flex items-center justify-between py-4 px-4">
           <div className="flex items-center gap-2">
             <MessageSquare className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl text-primary">ChatFlow</span>
+            <span className="font-bold text-xl text-primary">ZenZone</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Features</a>
@@ -134,7 +134,7 @@ const Home = () => {
               <div className="w-3 h-3 rounded-full bg-red-500"></div>
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <div className="text-xs text-gray-500 ml-2">ChatFlow App</div>
+              <div className="text-xs text-gray-500 ml-2">ZenZone</div>
             </div>
             <div className="p-4 bg-gray-50">
               <div className="flex items-center gap-3 mb-4">
@@ -369,26 +369,26 @@ const Home = () => {
             <p className="text-primary font-semibold mb-2">TESTIMONIALS</p>
             <h2 className="text-3xl font-bold text-gray-900">What our customers are saying</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto mt-4">
-              Thousands of teams trust ChatFlow for their daily communication needs.
+              Thousands of teams trust ZenZone for their daily communication needs.
             </p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                quote: "ChatFlow has transformed how our remote team collaborates. The interface is intuitive, and the real-time messaging is incredibly reliable.",
+                quote: "ZenZone has transformed how our remote team collaborates. The interface is intuitive, and the real-time messaging is incredibly reliable.",
                 author: "Sarah Johnson",
                 role: "CTO at TechVision",
                 avatar: 1
               },
               {
-                quote: "We've tried many team communication tools, but none matched the simplicity and effectiveness of ChatFlow. It's now essential to our workflow.",
+                quote: "We've tried many team communication tools, but none matched the simplicity and effectiveness of ZenZone. It's now essential to our workflow.",
                 author: "Michael Chen",
                 role: "Product Manager at Innovate Inc",
                 avatar: 2
               },
               {
-                quote: "The security features in ChatFlow give us peace of mind when discussing sensitive projects. It's the perfect balance of usability and safety.",
+                quote: "The security features in ZenZone give us peace of mind when discussing sensitive projects. It's the perfect balance of usability and safety.",
                 author: "Aisha Patel",
                 role: "Security Director at SecureWorks",
                 avatar: 3
@@ -576,7 +576,7 @@ const Home = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to transform your team's communication?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Join thousands of teams that use ChatFlow to collaborate effectively.
+            Join thousands of teams that use ZenZone to collaborate effectively.
           </p>
           <Button 
             size="lg" 
@@ -596,7 +596,7 @@ const Home = () => {
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-4">
                 <MessageSquare className="h-6 w-6 text-white" />
-                <span className="font-bold text-xl">ChatFlow</span>
+                <span className="font-bold text-xl">ZenZone</span>
               </div>
               <p className="text-gray-400 mb-6">
                 The modern platform for team communication and collaboration.
@@ -655,7 +655,7 @@ const Home = () => {
           </div>
           
           <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400">© 2024 ChatFlow. All rights reserved.</p>
+            <p className="text-gray-400">© 2025 ZenZone. All rights reserved.</p>
             <div className="flex gap-8 mt-4 md:mt-0">
               <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
               <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</a>

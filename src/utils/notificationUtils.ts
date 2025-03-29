@@ -1,7 +1,5 @@
 
 import { toast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
-import { type ToastActionElement } from "@/components/ui/toast";
 
 type NotificationOptions = {
   channelName: string;
@@ -24,10 +22,8 @@ export const showMessageNotification = ({
     description: `${senderName}: ${messageContent}`,
     duration: 5000,
     action: onClick ? {
-      altText: "View message",
       onClick: onClick,
-      children: "View"
-    } as unknown as ToastActionElement : undefined,
+    } : undefined,
   });
 
   // Also play notification sound if browser supports it
@@ -42,7 +38,3 @@ export const showMessageNotification = ({
     // Ignore errors with audio playback
   }
 };
-
-// We're removing the broadcast notification function as it's redundant
-// with the regular message notification. This helps prevent duplicate
-// notifications for the same message.

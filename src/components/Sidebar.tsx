@@ -84,7 +84,7 @@ export default function Sidebar({
                   >
                     <span className="mr-2">{renderChannelIcon(channel)}</span>
                     <span className="flex-1 truncate">{channel.name}</span>
-                    {channel.unreadCount && (
+                    {channel.unreadCount > 0 && (
                       <span className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
                         {channel.unreadCount}
                       </span>

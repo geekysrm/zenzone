@@ -32,10 +32,16 @@ export function Toaster() {
             </div>
             {action && (
               <ToastAction 
-                altText={action.altText}
-                onClick={action.onClick}
+                altText="View"
+                onClick={() => {
+                  if (typeof action === 'function') {
+                    action()
+                  } else if (action.onClick) {
+                    action.onClick()
+                  }
+                }}
               >
-                {action.children}
+                View
               </ToastAction>
             )}
             <ToastClose />

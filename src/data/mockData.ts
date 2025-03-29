@@ -44,7 +44,7 @@ export const mockSections: Section[] = [
     items: [
       { id: "announcements", name: "announcements", type: "channel" },
       { id: "design-crit", name: "design-crit", type: "channel", isPrivate: true },
-      { id: "media-and-pr", name: "media-and-pr", type: "channel", unreadCount: 1 },
+      { id: "media-and-pr", name: "media-and-pr", type: "channel" },
       { id: "social-media", name: "social-media", type: "channel" },
       { id: "team-marketing", name: "team-marketing", type: "channel" },
     ],
@@ -53,7 +53,7 @@ export const mockSections: Section[] = [
     id: "direct",
     title: "Direct messages",
     items: [
-      { id: "dm-lee", name: "Lee Hao", type: "direct", unreadCount: 2 },
+      { id: "dm-lee", name: "Lee Hao", type: "direct" },
     ],
   },
 ];

@@ -84,7 +84,7 @@ function EventMessage({ message }: { message: Message }) {
             <Headphones size={18} className="text-gray-600" />
           </div>
           <div>
-            <p className="font-medium">{message.content}</p>
+            <p className="font-medium">{renderMarkdown(message.content)}</p>
             <p className="text-sm text-gray-600">
               {message.eventDetails.details}
             </p>
@@ -102,7 +102,7 @@ function EventMessage({ message }: { message: Message }) {
               <span className="font-bold text-gray-800">{message.user.name}</span>
               <span className="text-xs text-gray-500">{formatTimestamp(message.timestamp)}</span>
             </div>
-            <p>{message.content}</p>
+            <div dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}></div>
             <div className="mt-1 pl-4 border-l-2 border-gray-300">
               <p className="font-medium">{message.eventDetails.details}</p>
               {message.eventDetails.time && (
@@ -157,8 +157,8 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
           )}
         </div>
         
-        <div className="text-gray-800">
-          <p>{message.content}</p>
+        <div className={cn("text-gray-800", isCurrentUser ? "text-right" : "text-left")}>
+          <div dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}></div>
         </div>
         
         {message.attachments && message.attachments.length > 0 && (
@@ -202,4 +202,32 @@ function formatTimestamp(timestamp: string): string {
     console.error("Error formatting timestamp:", error);
     return "just now";
   }
+}
+
+// Helper function to render Markdown
+function renderMarkdown(text: string): string {
+  // Bold
+  let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  // Italic
+  formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  
+  // Code
+  formatted = formatted.replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 rounded">$1</code>');
+  
+  // Headers
+  formatted = formatted.replace(/^### (.*?)$/gm, '<h3 class="text-lg font-semibold">$1</h3>');
+  formatted = formatted.replace(/^## (.*?)$/gm, '<h2 class="text-xl font-semibold">$1</h2>');
+  formatted = formatted.replace(/^# (.*?)$/gm, '<h1 class="text-2xl font-semibold">$1</h1>');
+  
+  // Lists
+  formatted = formatted.replace(/^\- (.*?)$/gm, '<li>$1</li>');
+  
+  // Links
+  formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-600 hover:underline">$1</a>');
+  
+  // Line breaks
+  formatted = formatted.replace(/\n/g, '<br>');
+  
+  return formatted;
 }

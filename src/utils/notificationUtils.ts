@@ -1,42 +1,30 @@
+import { toast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
-import { toast } from "@/hooks/use-toast";
-import { getInitials } from "@/utils/avatarUtils";
-
-type NotificationOptions = {
+export function showMessageNotification({
+  channelName,
+  senderName,
+  messageContent,
+  onClick
+}: {
   channelName: string;
   senderName: string;
   messageContent: string;
-  onClick?: () => void;
-};
-
-/**
- * Display a notification toast for a new message
- */
-export const showMessageNotification = ({ 
-  channelName, 
-  senderName, 
-  messageContent,
-  onClick
-}: NotificationOptions) => {
-  toast({
-    title: `New message in #${channelName}`,
-    description: `${senderName}: ${messageContent}`,
-    duration: 5000,
-    action: onClick ? {
-      children: "View",
-      onClick
-    } : undefined,
-  });
-
-  // Also play notification sound if browser supports it
+  onClick: () => void;
+}) {
   try {
+    // Play notification sound
     const audio = new Audio('/notification-sound.mp3');
-    audio.volume = 0.5;
-    audio.play().catch(error => {
-      // Silently fail - browsers may block autoplay
-      console.log("Could not play notification sound:", error);
+    audio.play().catch(err => console.error('Failed to play notification sound:', err));
+    
+    // Show toast notification
+    toast({
+      title: `${senderName} in #${channelName}`,
+      description: messageContent,
+      action: <ToastAction altText="View message" onClick={onClick}>View</ToastAction>,
+      duration: 5000,
     });
   } catch (error) {
-    // Ignore errors with audio playback
+    console.error('Error showing notification:', error);
   }
-};
+}

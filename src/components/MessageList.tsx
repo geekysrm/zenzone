@@ -2,6 +2,8 @@
 import { Message } from "@/types/chat";
 import { formatRelativeTime } from "@/lib/dateUtils";
 import { Headphones, Paperclip } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/lib/utils";
 
 interface MessageListProps {
   messages: Message[];
@@ -9,6 +11,8 @@ interface MessageListProps {
 }
 
 export default function MessageList({ messages, channelName }: MessageListProps) {
+  const { user } = useAuth();
+  
   if (messages.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
@@ -24,7 +28,7 @@ export default function MessageList({ messages, channelName }: MessageListProps)
           {message.isEvent ? (
             <EventMessage message={message} />
           ) : (
-            <UserMessage message={message} />
+            <UserMessage message={message} isCurrentUser={message.user.id === user?.id} />
           )}
         </div>
       ))}
@@ -77,9 +81,12 @@ function EventMessage({ message }: { message: Message }) {
   );
 }
 
-function UserMessage({ message }: { message: Message }) {
+function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUser: boolean }) {
   return (
-    <div className="flex items-start gap-2">
+    <div className={cn(
+      "flex items-start gap-2 max-w-[80%]",
+      isCurrentUser ? "ml-auto flex-row-reverse" : ""
+    )}>
       <div className="w-10 h-10 flex-shrink-0">
         <img 
           src={message.user.avatar} 
@@ -87,16 +94,33 @@ function UserMessage({ message }: { message: Message }) {
           className="w-full h-full rounded"
         />
       </div>
-      <div className="flex-1">
-        <div className="flex items-baseline gap-2">
+      <div className={cn(
+        "flex-1",
+        isCurrentUser ? "text-right" : ""
+      )}>
+        <div className={cn(
+          "flex items-baseline gap-2",
+          isCurrentUser ? "flex-row-reverse" : ""
+        )}>
           <span className="font-bold">{message.user.name}</span>
           <span className="text-xs text-gray-500">{message.timestamp}</span>
         </div>
-        <p>{message.content}</p>
+        <div className={cn(
+          "p-3 rounded-lg mt-1 inline-block",
+          isCurrentUser ? "bg-blue-500 text-white" : "bg-gray-100"
+        )}>
+          <p>{message.content}</p>
+        </div>
         {message.attachments && message.attachments.length > 0 && (
-          <div className="mt-2">
+          <div className={cn(
+            "mt-2", 
+            isCurrentUser ? "float-right clear-both" : ""
+          )}>
             {message.attachments.map(attachment => (
-              <div key={attachment.id} className="flex items-center gap-2 p-2 border rounded bg-gray-50 max-w-md">
+              <div key={attachment.id} className={cn(
+                "flex items-center gap-2 p-2 border rounded bg-gray-50 max-w-md",
+                isCurrentUser ? "flex-row-reverse" : ""
+              )}>
                 <div className="bg-purple-100 p-2 rounded">
                   <Paperclip size={16} className="text-purple-600" />
                 </div>

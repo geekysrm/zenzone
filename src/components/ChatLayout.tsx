@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 import ChannelHeader from "./ChannelHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
-import { Channel, Message } from "@/types/chat";
+import { Channel, Message, Attachment } from "@/types/chat";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -59,8 +59,8 @@ export default function ChatLayout({
               avatar: user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User&background=random',
             },
             isEvent: msg.is_event || false,
-            eventDetails: msg.event_details,
-            attachments: msg.attachments
+            eventDetails: msg.event_details || undefined,
+            attachments: msg.attachments ? (Array.isArray(msg.attachments) ? msg.attachments : []) : [],
           }));
           
           setMessages(formattedMessages);
@@ -98,8 +98,8 @@ export default function ChatLayout({
                 avatar: user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User&background=random',
               },
               isEvent: newMessage.is_event || false,
-              eventDetails: newMessage.event_details,
-              attachments: newMessage.attachments
+              eventDetails: newMessage.event_details || undefined,
+              attachments: newMessage.attachments ? (Array.isArray(newMessage.attachments) ? newMessage.attachments : []) : [],
             }
           ]);
         }

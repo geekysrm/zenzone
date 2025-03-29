@@ -12,16 +12,22 @@ interface MessageSummaryProps {
 
 export default function MessageSummary({ messages, channelName }: MessageSummaryProps) {
   const [summary, setSummary] = useState<React.ReactNode | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   
   const handleGenerateSummary = () => {
+    if (isGenerating) return;
+    
+    setIsGenerating(true);
     const summaryUI = summarizeMessages(messages, channelName);
     setSummary(summaryUI);
   };
   
+  const hasMessages = messages.length > 0;
+  
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" disabled={!hasMessages}>
           <Sparkles className="h-4 w-4 mr-2" />
           Summarize Unread
         </Button>
@@ -38,11 +44,16 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
                 {summary}
               </div>
             ) : (
-              "Click 'Generate Summary' to create a summary of unread messages."
+              hasMessages 
+                ? "Click 'Generate Summary' to create a summary of unread messages."
+                : "No unread messages to summarize."
             )}
           </div>
           <div className="flex justify-end">
-            <Button onClick={handleGenerateSummary}>
+            <Button 
+              onClick={handleGenerateSummary} 
+              disabled={isGenerating || !hasMessages}
+            >
               <Sparkles className="h-4 w-4 mr-2" />
               Generate Summary
             </Button>

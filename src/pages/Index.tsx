@@ -78,11 +78,16 @@ const Index = () => {
           // Skip notifications for the active channel (user is already viewing it)
           if (channel.id === activeChannel.id) return;
           
-          // Show broadcast notification
+          // Find the channel to navigate to
+          const targetChannel = allChannels.find(c => c.id === channel.id);
+          if (!targetChannel) return;
+          
+          // Show broadcast notification with click handler to navigate to channel
           showBroadcastNotification({
             channelName: payload.payload.channel_name,
             senderName: payload.payload.sender_name,
-            messageContent: payload.payload.message
+            messageContent: payload.payload.message,
+            onClick: () => handleChannelSelect(targetChannel)
           });
         })
         .subscribe();

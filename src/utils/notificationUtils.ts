@@ -48,12 +48,18 @@ export const showMessageNotification = ({
 export const showBroadcastNotification = ({
   channelName,
   senderName,
-  messageContent
-}: Omit<NotificationOptions, 'onClick'>) => {
+  messageContent,
+  onClick
+}: NotificationOptions) => {
   toast({
     title: `Broadcast in #${channelName}`,
     description: `${senderName}: ${messageContent}`,
     duration: 5000,
+    action: onClick ? {
+      altText: "View message",
+      onClick: onClick,
+      children: "View"
+    } as ToastActionElement : undefined,
   });
   
   // Also play notification sound if browser supports it

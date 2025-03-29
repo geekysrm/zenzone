@@ -48,7 +48,7 @@ const Home = () => {
                 className="group"
                 onClick={() => navigate("/chat")}
               >
-                Go to Dashboard
+                Go to Chat
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             ) : (
@@ -174,7 +174,7 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <p className="text-center text-sm font-medium text-gray-500 mb-6">TRUSTED BY LEADING COMPANIES</p>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center justify-items-center opacity-75">
-            {['Airbnb', 'Spotify', 'Slack', 'Netflix', 'Uber', 'Dropbox'].map((brand, i) => (
+            {['Airbnb', 'Spotify', 'Amazon', 'Netflix', 'Uber', 'Dropbox'].map((brand, i) => (
               <div key={i} className="text-xl font-bold text-gray-400">{brand}</div>
             ))}
           </div>

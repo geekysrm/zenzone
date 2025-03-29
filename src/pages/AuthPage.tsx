@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -93,7 +92,7 @@ const AuthPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-slate-50">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 shadow-lg rounded-lg">
+      <div className="w-full max-w-md space-y-6 bg-white p-8 shadow-lg rounded-lg">
         <div className="flex flex-col items-center">
           <div className="w-full">
             <button 
@@ -106,10 +105,10 @@ const AuthPage = () => {
           <h1 className="text-3xl font-bold mt-2">
             {isSignUp ? "Create Account" : "Welcome Back"}
           </h1>
+          <p className="text-gray-600 mt-1">
+            {isSignUp ? "Sign up to get started" : "Sign in to your account"}
+          </p>
         </div>
-        <p className="mt-2 text-gray-600 text-center">
-          {isSignUp ? "Sign up to get started" : "Sign in to your account"}
-        </p>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-8 space-y-6">

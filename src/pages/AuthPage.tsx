@@ -94,14 +94,18 @@ const AuthPage = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-slate-50">
       <div className="w-full max-w-md space-y-8 bg-white p-8 shadow-lg rounded-lg">
-        <div className="flex justify-between items-center">
-          <button 
-            onClick={() => navigate("/")} 
-            className="flex items-center text-gray-600 hover:text-primary transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" /> Back
-          </button>
-          <h1 className="text-3xl font-bold">{isSignUp ? "Create Account" : "Welcome Back"}</h1>
+        <div className="flex flex-col items-center">
+          <div className="w-full">
+            <button 
+              onClick={() => navigate("/")} 
+              className="flex items-center text-gray-600 hover:text-primary transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" /> Back
+            </button>
+          </div>
+          <h1 className="text-3xl font-bold mt-2">
+            {isSignUp ? "Create Account" : "Welcome Back"}
+          </h1>
         </div>
         <p className="mt-2 text-gray-600 text-center">
           {isSignUp ? "Sign up to get started" : "Sign in to your account"}

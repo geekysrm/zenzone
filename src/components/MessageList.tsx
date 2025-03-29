@@ -93,13 +93,16 @@ function EventMessage({ message }: { message: Message }) {
       ) : (
         <div className="flex items-start gap-2">
           <Avatar className="w-9 h-9 flex-shrink-0 mt-1">
-            <AvatarImage
-              src={message.user.avatar}
-              alt={message.user.name}
-            />
-            <AvatarFallback className={cn(avatarColors.bg, avatarColors.text)}>
-              {userInitials}
-            </AvatarFallback>
+            {message.user.avatar ? (
+              <AvatarImage
+                src={message.user.avatar}
+                alt={message.user.name}
+              />
+            ) : (
+              <AvatarFallback className={cn(avatarColors.bg, avatarColors.text)}>
+                {userInitials}
+              </AvatarFallback>
+            )}
           </Avatar>
           <div className="flex-1">
             <div className="flex items-baseline gap-2">
@@ -134,13 +137,16 @@ function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUs
       isCurrentUser ? "flex-row-reverse" : "flex-row"
     )}>
       <Avatar className="w-9 h-9 flex-shrink-0 mt-1">
-        <AvatarImage
-          src={message.user.avatar}
-          alt={message.user.name}
-        />
-        <AvatarFallback className={cn(avatarColors.bg, avatarColors.text)}>
-          {userInitials}
-        </AvatarFallback>
+        {message.user.avatar ? (
+          <AvatarImage
+            src={message.user.avatar}
+            alt={message.user.name}
+          />
+        ) : (
+          <AvatarFallback className={cn(avatarColors.bg, avatarColors.text)}>
+            {userInitials}
+          </AvatarFallback>
+        )}
       </Avatar>
       
       <div className={cn(

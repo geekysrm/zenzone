@@ -1,6 +1,9 @@
 
 import { Channel } from "@/types/chat";
-import { ChevronDown, Hash, Headphones, Search, Users } from "lucide-react";
+import { ChevronDown, Hash, Headphones, Search, Sparkles, Users } from "lucide-react";
+import { MessageForSummary } from "@/utils/summaryUtils";
+import { Button } from "@/components/ui/button";
+import MessageSummary from "@/components/MessageSummary";
 
 interface ChannelHeaderProps {
   channel: Channel;
@@ -9,6 +12,9 @@ interface ChannelHeaderProps {
 }
 
 export default function ChannelHeader({ channel, topic, participantCount }: ChannelHeaderProps) {
+  // Create empty messages array for the summary component
+  const dummyMessages: MessageForSummary[] = [];
+
   return (
     <div className="border-b flex items-center justify-between p-3">
       <div className="flex items-center space-x-2">
@@ -31,6 +37,13 @@ export default function ChannelHeader({ channel, topic, participantCount }: Chan
             <span className="text-sm">{participantCount}</span>
           </div>
         )}
+        <MessageSummary 
+          messages={dummyMessages}
+          channelName={channel.name}
+          channelId={channel.id}
+          unreadCount={channel.unreadCount}
+          buttonText="Summarize Recent" // Custom button text
+        />
         <button className="flex items-center text-gray-500 hover:text-gray-800 transition-colors">
           <Headphones size={16} />
         </button>

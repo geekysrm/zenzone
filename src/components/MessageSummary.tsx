@@ -11,13 +11,15 @@ interface MessageSummaryProps {
   channelName: string;
   channelId?: string;
   unreadCount?: number;
+  buttonText?: string; // New prop for custom button text
 }
 
 export default function MessageSummary({ 
   messages, 
   channelName,
   channelId,
-  unreadCount = 0
+  unreadCount = 0,
+  buttonText = "Summarize Unread" // Default is still "Summarize Unread"
 }: MessageSummaryProps) {
   const [summary, setSummary] = useState<React.ReactNode | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -53,7 +55,7 @@ export default function MessageSummary({
           disabled={!hasMessages}
         >
           <Sparkles className="h-4 w-4 mr-2" />
-          Summarize Unread
+          {buttonText}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl">

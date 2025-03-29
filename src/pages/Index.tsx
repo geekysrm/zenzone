@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ChatLayout } from "@/components/ChatLayout";
 import { Channel, Message } from "@/types/chat";
@@ -72,25 +73,40 @@ const Index = () => {
       if (channel.id === activeChannel.id) return null;
       
       return supabase
-        .channel(`message:${channel.id}`)
-        .on('broadcast', { event: 'message' }, (payload) => {
-          // Skip notifications for messages sent by the current user
-          if (payload.payload.sender_id === user.id) return;
-          
-          // Find the channel to navigate to
-          const targetChannel = allChannels.find(c => c.id === channel.id);
-          if (!targetChannel) return;
-          
-          // Show notification with click handler to navigate to channel
-          showMessageNotification({
-            channelName: payload.payload.channel_name,
-            senderName: payload.payload.sender_name,
-            messageContent: payload.payload.message,
-            onClick: () => handleChannelSelect(targetChannel)
-          });
-        })
+        .channel(`messages:${channel.id}`)
+        .on('postgres_changes', 
+          { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'messages',
+            filter: `channel_id=eq.${channel.id}`
+          }, 
+          async (payload) => {
+            // Skip notifications for messages sent by the current user
+            if (payload.new.user_id === user.id) return;
+            
+            // Find the channel
+            const targetChannel = allChannels.find(c => c.id === channel.id);
+            if (!targetChannel) return;
+            
+            // Get sender's profile
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('username')
+              .eq('id', payload.new.user_id)
+              .single();
+            
+            // Show notification with click handler to navigate to channel
+            showMessageNotification({
+              channelName: targetChannel.name,
+              senderName: profile?.username || 'Unknown user',
+              messageContent: payload.new.content,
+              onClick: () => handleChannelSelect(targetChannel)
+            });
+          }
+        )
         .subscribe();
-        
+      
       return messageSubscriptions;
     }).filter(Boolean);
     

@@ -1,11 +1,6 @@
 
-import { toast } from "@/components/ui/use-toast";
-
-// Define a type for the toast action
-type ToastAction = {
-  onClick: () => void;
-  label: string;
-};
+import { toast } from "@/hooks/use-toast";
+import { Bell } from "lucide-react";
 
 export function showMessageNotification({
   channelName,
@@ -25,13 +20,17 @@ export function showMessageNotification({
     
     // Show toast notification
     toast({
-      title: `${senderName} in #${channelName}`,
+      title: (
+        <div className="flex items-center gap-2">
+          <Bell className="h-4 w-4" />
+          <span>{senderName} in #{channelName}</span>
+        </div>
+      ),
       description: messageContent,
-      // Cast the action to any to work around the type compatibility issues
       action: {
         label: "View",
-        onClick: onClick
-      } as any,
+        onClick: onClick,
+      },
       duration: 5000,
     });
   } catch (error) {

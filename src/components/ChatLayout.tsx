@@ -8,7 +8,7 @@ import { Channel, Message, Attachment } from "@/types/chat";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import { showMessageNotification } from "@/utils/notificationUtils";
+import { showMessageNotification, showBroadcastNotification } from "@/utils/notificationUtils";
 
 interface ChatLayoutProps {
   sections: any[];
@@ -221,10 +221,27 @@ export default function ChatLayout({
         return;
       }
       
+      // Show a success toast to the sender
       toast({
         title: "Message sent",
         description: "Your message has been sent successfully.",
         duration: 2000,
+      });
+      
+      // Broadcast to channel members (this will be picked up by all subscribers to this channel)
+      // The notification will be shown to all members except the sender
+      // The sender has already received a "Message sent" notification
+      const broadcastChannel = supabase.channel(`broadcast:${activeChannel.id}`);
+      broadcastChannel.send({
+        type: 'broadcast',
+        event: 'message',
+        payload: {
+          sender_id: user.id,
+          sender_name: user?.user_metadata?.name || 'User',
+          channel_id: activeChannel.id,
+          channel_name: activeChannel.name,
+          message: messageText
+        }
       });
       
     } catch (error) {

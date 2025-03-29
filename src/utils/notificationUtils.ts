@@ -41,3 +41,30 @@ export const showMessageNotification = ({
     // Ignore errors with audio playback
   }
 };
+
+/**
+ * Display a notification toast for a message broadcast
+ */
+export const showBroadcastNotification = ({
+  channelName,
+  senderName,
+  messageContent
+}: Omit<NotificationOptions, 'onClick'>) => {
+  toast({
+    title: `Broadcast in #${channelName}`,
+    description: `${senderName}: ${messageContent}`,
+    duration: 5000,
+  });
+  
+  // Also play notification sound if browser supports it
+  try {
+    const audio = new Audio('/notification-sound.mp3');
+    audio.volume = 0.5;
+    audio.play().catch(error => {
+      // Silently fail - browsers may block autoplay
+      console.log("Could not play notification sound:", error);
+    });
+  } catch (error) {
+    // Ignore errors with audio playback
+  }
+};

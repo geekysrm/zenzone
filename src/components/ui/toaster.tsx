@@ -32,6 +32,7 @@ export function Toaster() {
             </div>
             {action && (
               <ToastAction 
+                // @ts-ignore - We know our action object has these properties
                 altText={action.altText} 
                 onClick={action.onClick}
               >

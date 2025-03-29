@@ -5,8 +5,8 @@ import type {
   ToastProps,
 } from "@/components/ui/toast"
 
-const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_LIMIT = 5  // Increased from 1 to show multiple notifications
+const TOAST_REMOVE_DELAY = 10000  // Changed from 1000000 to 10 seconds
 
 type ToasterToast = ToastProps & {
   id: string
@@ -139,7 +139,13 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
-function toast({ ...props }: Toast) {
+function toast({ 
+  variant = "default", 
+  title, 
+  description, 
+  action, 
+  ...props 
+}: Toast) {
   const id = genId()
 
   const update = (props: ToasterToast) =>
@@ -152,12 +158,16 @@ function toast({ ...props }: Toast) {
   dispatch({
     type: "ADD_TOAST",
     toast: {
-      ...props,
+      variant,
+      title,
+      description,
+      action,
       id,
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss()
       },
+      ...props,
     },
   })
 

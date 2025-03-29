@@ -8,6 +8,7 @@ import { Channel, Message, Attachment } from "@/types/chat";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { showMessageNotification } from "@/utils/notificationUtils";
 
 interface ChatLayoutProps {
   sections: any[];
@@ -136,6 +137,59 @@ export default function ChatLayout({
       supabase.removeChannel(channel);
     };
   }, [activeChannel, user]);
+
+  // Subscribe to notifications for all channels except the active one
+  useEffect(() => {
+    if (!user) return;
+    
+    // Get all channel IDs except the active one
+    const allChannelIds = sections.flatMap(section => 
+      section.items.map((item: Channel) => item.id)
+    ).filter(id => id !== activeChannel.id);
+    
+    if (allChannelIds.length === 0) return;
+    
+    // Create subscriptions for all other channels
+    const channels = allChannelIds.map(channelId => {
+      return supabase
+        .channel(`public:messages:channel:${channelId}`)
+        .on('postgres_changes', 
+          { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'messages',
+            filter: `channel_id=eq.${channelId}`
+          }, 
+          (payload) => {
+            const newMessage = payload.new;
+            
+            // Skip notifications for messages sent by the current user
+            if (newMessage.user_id === user.id) return;
+            
+            // Find channel name
+            const channelInfo = sections.flatMap(section => section.items)
+              .find((item: Channel) => item.id === channelId);
+            
+            if (!channelInfo) return;
+            
+            // Show notification
+            showMessageNotification({
+              channelName: channelInfo.name,
+              senderName: 'New message', // Will be replaced with actual name when available
+              messageContent: newMessage.content,
+              onClick: () => setActiveChannel(channelInfo)
+            });
+          }
+        )
+        .subscribe();
+    });
+    
+    return () => {
+      channels.forEach(channel => {
+        supabase.removeChannel(channel);
+      });
+    };
+  }, [sections, activeChannel.id, user, setActiveChannel]);
 
   const handleSendMessage = async (messageText: string) => {
     if (!user) {

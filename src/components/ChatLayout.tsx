@@ -1,6 +1,6 @@
 
-import { useState, useEffect, ReactNode } from "react";
-import { Channel, Message, Section } from "@/types/chat";
+import { useState, useEffect } from "react";
+import { Channel, Message, Section, User } from "@/types/chat";
 import Sidebar from "@/components/Sidebar";
 import ChannelHeader from "@/components/ChannelHeader";
 import MessageList from "@/components/MessageList";
@@ -17,14 +17,14 @@ interface ChatLayoutProps {
   setActiveChannel: (channel: Channel) => void;
 }
 
-const ChatLayout = ({
+export function ChatLayout({
   sections,
   activeChannel,
   messages: initialMessages,
   workspaceName,
   workspaceLogo,
   setActiveChannel,
-}: ChatLayoutProps) => {
+}: ChatLayoutProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [participants, setParticipants] = useState<number>(0);
   const [channelTopic, setChannelTopic] = useState<string>("");
@@ -80,13 +80,33 @@ const ChatLayout = ({
           filter: `channel_id=eq.${activeChannel.id}`
         }, 
         (payload) => {
-          const newMessage = payload.new as Message;
+          const newMessage = payload.new as any;
           
           // Only add the message if it's not already in the list
           setMessages(currentMessages => {
             const exists = currentMessages.some(m => m.id === newMessage.id);
             if (exists) return currentMessages;
-            return [...currentMessages, newMessage];
+            
+            // We need to fetch user data for this message
+            const messageWithUser: Message = {
+              id: newMessage.id,
+              content: newMessage.content,
+              timestamp: newMessage.timestamp,
+              user: {
+                id: newMessage.user_id,
+                name: "Loading...", // Placeholder until we fetch profile
+                avatar: `https://i.pravatar.cc/150?u=${newMessage.user_id}`,
+              },
+              reactions: [],
+              attachments: newMessage.attachments || [],
+              isEvent: newMessage.is_event || false,
+              eventDetails: newMessage.event_details,
+            };
+            
+            // Fetch user profile for this message
+            fetchUserProfile(newMessage.user_id);
+            
+            return [...currentMessages, messageWithUser];
           });
         }
       )
@@ -100,6 +120,41 @@ const ChatLayout = ({
     };
   }, [activeChannel?.id, user]);
 
+  // Helper function to fetch a single user profile
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (error || !data) {
+        console.error("Error fetching user profile:", error);
+        return;
+      }
+      
+      // Update messages with this user's data
+      setMessages(currentMessages => 
+        currentMessages.map(message => 
+          message.user.id === userId
+            ? {
+                ...message,
+                user: {
+                  id: data.id,
+                  name: data.username || "Anonymous User",
+                  avatar: data.avatar_url || `https://i.pravatar.cc/150?u=${data.id}`,
+                  status: "online"
+                }
+              }
+            : message
+        )
+      );
+    } catch (err) {
+      console.error("Error in fetchUserProfile:", err);
+    }
+  };
+
   const fetchMessages = async () => {
     try {
       setIsLoadingMessages(true);
@@ -109,7 +164,7 @@ const ChatLayout = ({
         .from('messages')
         .select('*')
         .eq('channel_id', activeChannel.id)
-        .order('created_at', { ascending: true });
+        .order('timestamp', { ascending: true });
         
       if (error) {
         console.error("Error fetching messages:", error);
@@ -118,6 +173,7 @@ const ChatLayout = ({
       
       // Need to fetch user profiles for these messages
       const userIds = [...new Set(data.map(msg => msg.user_id))];
+      
       if (userIds.length > 0) {
         try {
           const { data: profiles, error: profilesError } = await supabase
@@ -128,12 +184,31 @@ const ChatLayout = ({
           if (profilesError) {
             console.error("Error fetching user profiles:", profilesError);
           } else {
-            // Add user data to messages
-            const messagesWithUserData = data.map(message => {
+            // Transform database messages to match our Message type
+            const messagesWithUserData: Message[] = data.map(message => {
               const userProfile = profiles.find(profile => profile.id === message.user_id);
+              
               return {
-                ...message,
-                user: userProfile || { name: "Unknown User" }
+                id: message.id,
+                content: message.content,
+                timestamp: message.timestamp,
+                user: userProfile 
+                  ? {
+                      id: userProfile.id,
+                      name: userProfile.username || "Anonymous User",
+                      avatar: userProfile.avatar_url || `https://i.pravatar.cc/150?u=${userProfile.id}`,
+                      status: "online"
+                    }
+                  : {
+                      id: message.user_id,
+                      name: "Unknown User",
+                      avatar: `https://i.pravatar.cc/150?u=${message.user_id}`,
+                      status: "offline"
+                    },
+                reactions: [],
+                attachments: message.attachments || [],
+                isEvent: message.is_event || false,
+                eventDetails: message.event_details,
               };
             });
             
@@ -143,7 +218,8 @@ const ChatLayout = ({
           console.error("Error fetching user profiles:", err);
         }
       } else {
-        setMessages(data);
+        // If no messages, set empty array
+        setMessages([]);
       }
     } catch (err) {
       console.error("Error in fetchMessages:", err);
@@ -203,13 +279,16 @@ const ChatLayout = ({
         <div className="flex-1 overflow-hidden">
           <MessageList 
             messages={messages} 
-            isLoading={isLoadingMessages} 
+            channelName={activeChannel.name}
           />
         </div>
-        <MessageInput onSendMessage={handleSendMessage} />
+        <MessageInput 
+          onSendMessage={handleSendMessage} 
+          channelName={activeChannel.name}
+        />
       </div>
     </div>
   );
-};
+}
 
 export default ChatLayout;

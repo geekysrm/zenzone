@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import ChatLayout from "@/components/ChatLayout";
+import { ChatLayout } from "@/components/ChatLayout";
 import { Channel, Message } from "@/types/chat";
 import { mockCurrentChannel, mockSections } from "@/data/mockData";
 import { useAuth } from "@/context/AuthContext";

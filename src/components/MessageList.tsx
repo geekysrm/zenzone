@@ -4,6 +4,7 @@ import { formatRelativeTime } from "@/lib/dateUtils";
 import { Headphones, Paperclip } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface MessageListProps {
   messages: Message[];
@@ -21,15 +22,35 @@ export default function MessageList({ messages, channelName }: MessageListProps)
     );
   }
 
+  // Group messages by date
+  const groupedMessages: { [key: string]: Message[] } = {};
+  messages.forEach(message => {
+    const date = new Date(message.timestamp).toLocaleDateString();
+    if (!groupedMessages[date]) {
+      groupedMessages[date] = [];
+    }
+    groupedMessages[date].push(message);
+  });
+
   return (
-    <div className="flex-1 overflow-y-auto p-4">
-      {messages.map((message) => (
-        <div key={message.id} className="mb-4">
-          {message.isEvent ? (
-            <EventMessage message={message} />
-          ) : (
-            <UserMessage message={message} isCurrentUser={message.user.id === user?.id} />
-          )}
+    <div className="flex-1 overflow-y-auto p-4 bg-white">
+      {Object.entries(groupedMessages).map(([date, dateMessages]) => (
+        <div key={date} className="mb-4">
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-px bg-gray-200 flex-grow"></div>
+            <div className="px-3 text-xs text-gray-500 font-medium">{date}</div>
+            <div className="h-px bg-gray-200 flex-grow"></div>
+          </div>
+          
+          {dateMessages.map((message) => (
+            <div key={message.id} className="mb-2">
+              {message.isEvent ? (
+                <EventMessage message={message} />
+              ) : (
+                <UserMessage message={message} isCurrentUser={message.user.id === user?.id} />
+              )}
+            </div>
+          ))}
         </div>
       ))}
     </div>
@@ -55,20 +76,20 @@ function EventMessage({ message }: { message: Message }) {
         </div>
       ) : (
         <div className="flex items-start gap-2">
-          <div className="w-10 h-10 flex-shrink-0">
-            <img 
-              src={message.user.avatar} 
-              alt={message.user.name} 
-              className="w-full h-full rounded"
+          <Avatar className="w-9 h-9 flex-shrink-0 mt-1">
+            <AvatarImage
+              src={message.user.avatar}
+              alt={message.user.name}
             />
-          </div>
+            <AvatarFallback>{message.user.name.substring(0, 2)}</AvatarFallback>
+          </Avatar>
           <div className="flex-1">
             <div className="flex items-baseline gap-2">
-              <span className="font-bold">{message.user.name}</span>
+              <span className="font-bold text-gray-800">{message.user.name}</span>
               <span className="text-xs text-gray-500">{message.timestamp}</span>
             </div>
             <p>{message.content}</p>
-            <div className="mt-1 pl-4 border-l-2 border-blue-500">
+            <div className="mt-1 pl-4 border-l-2 border-gray-300">
               <p className="font-medium">{message.eventDetails.details}</p>
               {message.eventDetails.time && (
                 <p className="text-sm text-gray-600">{message.eventDetails.time}</p>
@@ -82,45 +103,39 @@ function EventMessage({ message }: { message: Message }) {
 }
 
 function UserMessage({ message, isCurrentUser }: { message: Message; isCurrentUser: boolean }) {
+  // Format timestamp to match Slack
+  const timestamp = new Date(message.timestamp).toLocaleTimeString([], { 
+    hour: 'numeric', 
+    minute: '2-digit'
+  });
+  
   return (
     <div className={cn(
-      "flex items-start gap-2 max-w-[80%]",
-      isCurrentUser ? "ml-auto flex-row-reverse" : ""
+      "flex items-start gap-2 hover:bg-gray-50 px-2 py-1 rounded",
+      isCurrentUser ? "justify-start" : "justify-start"
     )}>
-      <div className="w-10 h-10 flex-shrink-0">
-        <img 
-          src={message.user.avatar} 
-          alt={message.user.name} 
-          className="w-full h-full rounded"
+      <Avatar className="w-9 h-9 flex-shrink-0 mt-1">
+        <AvatarImage
+          src={message.user.avatar}
+          alt={message.user.name}
         />
-      </div>
-      <div className={cn(
-        "flex-1",
-        isCurrentUser ? "text-right" : ""
-      )}>
-        <div className={cn(
-          "flex items-baseline gap-2",
-          isCurrentUser ? "flex-row-reverse" : ""
-        )}>
-          <span className="font-bold">{message.user.name}</span>
-          <span className="text-xs text-gray-500">{message.timestamp}</span>
+        <AvatarFallback>{message.user.name.substring(0, 2)}</AvatarFallback>
+      </Avatar>
+      
+      <div className="flex-1 max-w-[85%]">
+        <div className="flex items-baseline gap-2">
+          <span className="font-bold text-gray-800">{message.user.name}</span>
+          <span className="text-xs text-gray-500">{timestamp}</span>
         </div>
-        <div className={cn(
-          "p-3 rounded-lg mt-1 inline-block",
-          isCurrentUser ? "bg-blue-500 text-white" : "bg-gray-100"
-        )}>
+        
+        <div className="text-gray-800">
           <p>{message.content}</p>
         </div>
+        
         {message.attachments && message.attachments.length > 0 && (
-          <div className={cn(
-            "mt-2", 
-            isCurrentUser ? "float-right clear-both" : ""
-          )}>
+          <div className="mt-2">
             {message.attachments.map(attachment => (
-              <div key={attachment.id} className={cn(
-                "flex items-center gap-2 p-2 border rounded bg-gray-50 max-w-md",
-                isCurrentUser ? "flex-row-reverse" : ""
-              )}>
+              <div key={attachment.id} className="flex items-center gap-2 p-2 border rounded bg-gray-50 max-w-md">
                 <div className="bg-purple-100 p-2 rounded">
                   <Paperclip size={16} className="text-purple-600" />
                 </div>

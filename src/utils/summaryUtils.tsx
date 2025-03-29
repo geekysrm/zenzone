@@ -6,6 +6,9 @@ import { toast } from "@/components/ui/use-toast";
 // This will store any ongoing summarization tasks
 let activeSummarization: StreamableUI | null = null;
 
+// Hardcoded API key (not recommended for production)
+const API_KEY = "sk-proj-F8sgXaquIE9Creh5ntS7T3BlbkFJ0XK4URzASfYkwICq9wIq";
+
 export type MessageForSummary = {
   senderName: string;
   content: string;
@@ -14,8 +17,7 @@ export type MessageForSummary = {
 
 export function summarizeMessages(
   messages: MessageForSummary[],
-  channelName: string,
-  apiKey: string
+  channelName: string
 ) {
   // Cancel any existing summarization
   if (activeSummarization) {
@@ -62,7 +64,7 @@ Keep the summary brief but informative.
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`
+          "Authorization": `Bearer ${API_KEY}`
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",

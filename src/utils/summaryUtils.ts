@@ -41,7 +41,7 @@ export function summarizeMessages(
         `${new Date(msg.timestamp).toLocaleTimeString()} - ${msg.senderName}: ${msg.content}`
       ).join('\n');
       
-      // Create the prompt for Claude
+      // Create the prompt for OpenAI
       const prompt = `
 Here are messages from a channel named #${channelName} that I missed:
 
@@ -56,33 +56,37 @@ Please provide a concise summary of the important points discussed. Focus on:
 Keep the summary brief but informative.
       `;
       
-      // Call the Claude API
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      // Call the OpenAI API
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01"
+          "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: "claude-3-haiku-20240307",
-          max_tokens: 1024,
+          model: "gpt-4o-mini",
           messages: [
+            {
+              role: "system",
+              content: "You are a helpful assistant that summarizes chat conversations."
+            },
             {
               role: "user",
               content: prompt
             }
-          ]
+          ],
+          temperature: 0.3,
+          max_tokens: 500
         })
       });
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(`Claude API error: ${errorData.error?.message || response.statusText}`);
+        throw new Error(`OpenAI API error: ${errorData.error?.message || response.statusText}`);
       }
       
       const data = await response.json();
-      const summary = data.content[0].text;
+      const summary = data.choices[0].message.content;
       
       // Append the summary
       append(<div className="whitespace-pre-wrap">{summary}</div>);

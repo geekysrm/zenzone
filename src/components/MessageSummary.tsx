@@ -20,7 +20,7 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
   const handleGenerateSummary = () => {
     if (!apiKey) return;
     // Save API key in localStorage for convenience
-    localStorage.setItem("claude_api_key", apiKey);
+    localStorage.setItem("openai_api_key", apiKey);
     setShowApiInput(false);
     const summaryUI = summarizeMessages(messages, channelName, apiKey);
     setSummary(summaryUI);
@@ -28,7 +28,7 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
   
   // Try to load API key from localStorage on component mount
   React.useEffect(() => {
-    const savedKey = localStorage.getItem("claude_api_key");
+    const savedKey = localStorage.getItem("openai_api_key");
     if (savedKey) {
       setApiKey(savedKey);
       setShowApiInput(false);
@@ -50,13 +50,13 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
         {showApiInput ? (
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="api-key">Claude API Key</Label>
+              <Label htmlFor="api-key">OpenAI API Key</Label>
               <Input
                 id="api-key"
                 type="password"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your Claude API key"
+                placeholder="Enter your OpenAI API key"
               />
               <p className="text-sm text-gray-500">
                 Your API key is stored locally in your browser and is never sent to our servers.

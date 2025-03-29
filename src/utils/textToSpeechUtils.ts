@@ -50,7 +50,7 @@ export const speakText = async ({ text, voiceId = DEFAULT_VOICE_ID }: TextToSpee
       },
       body: JSON.stringify({
         text,
-        model_id: "eleven_multilingual_v2",
+        model_id: "eleven_flash_v2_5", // Updated to use eleven_flash_v2_5 model
         voice_settings: {
           stability: 0.5,
           similarity_boost: 0.5,

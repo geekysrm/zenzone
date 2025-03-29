@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { getInitials } from "@/utils/avatarUtils";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useRef } from "react";
 
 interface MessageListProps {
   messages: Message[];
@@ -14,6 +15,15 @@ interface MessageListProps {
 
 export default function MessageList({ messages, channelName, isLoading = false }: MessageListProps) {
   const { user } = useAuth();
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  
+  // Scroll to bottom when messages load or update
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollElement = scrollAreaRef.current;
+      scrollElement.scrollTop = scrollElement.scrollHeight;
+    }
+  }, [messages]);
   
   if (isLoading) {
     return (
@@ -54,7 +64,7 @@ export default function MessageList({ messages, channelName, isLoading = false }
   });
 
   return (
-    <ScrollArea className="h-full">
+    <ScrollArea className="h-full" ref={scrollAreaRef}>
       <div className="p-4 bg-white">
         {Object.entries(groupedMessages).map(([date, dateMessages]) => (
           <div key={date} className="mb-4">

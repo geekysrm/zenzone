@@ -309,21 +309,11 @@ export default function ChatLayout({
         onChannelSelect={setActiveChannel}
       />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <div className="flex items-center justify-between">
-          <ChannelHeader
-            channel={activeChannel}
-            topic={topic}
-            participantCount={58}
-          />
-          <div className="mr-4 flex items-center">
-            <MessageSummary 
-              messages={messagesForSummary} 
-              channelName={activeChannel.name}
-              channelId={activeChannel.id}
-              unreadCount={activeChannel.unreadCount}
-            />
-          </div>
-        </div>
+        <ChannelHeader
+          channel={activeChannel}
+          topic={topic}
+          participantCount={58}
+        />
         <MessageList messages={messages} channelName={activeChannel.name} />
         <MessageInput 
           channelName={activeChannel.name} 

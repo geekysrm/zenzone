@@ -42,7 +42,6 @@ export default function ChannelHeader({ channel, topic, participantCount }: Chan
           channelName={channel.name}
           channelId={channel.id}
           unreadCount={channel.unreadCount}
-          buttonText="Summarize Recent" // Custom button text
         />
         <button className="flex items-center text-gray-500 hover:text-gray-800 transition-colors">
           <Headphones size={16} />

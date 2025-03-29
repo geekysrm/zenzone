@@ -1,12 +1,12 @@
-
 import { useState, useEffect } from "react";
-import { Channel, Message, Section, User } from "@/types/chat";
+import { Channel, Message, Section, User, Attachment } from "@/types/chat";
 import Sidebar from "@/components/Sidebar";
 import ChannelHeader from "@/components/ChannelHeader";
 import MessageList from "@/components/MessageList";
 import MessageInput from "@/components/MessageInput";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { Json } from "@/integrations/supabase/types";
 
 interface ChatLayoutProps {
   sections: Section[];
@@ -155,6 +155,51 @@ export function ChatLayout({
     }
   };
 
+  // Helper function to parse attachments from the database
+  const parseAttachments = (attachmentsData: Json | null): Attachment[] => {
+    if (!attachmentsData) return [];
+    
+    // If it's an array, try to parse each item
+    if (Array.isArray(attachmentsData)) {
+      return attachmentsData.map((item, index) => {
+        // If item is already in correct format, use it
+        if (typeof item === 'object' && item !== null && 'id' in item && 'type' in item && 'name' in item && 'url' in item) {
+          return item as Attachment;
+        }
+        
+        // Otherwise create a default attachment
+        return {
+          id: `attachment-${index}`,
+          type: "file",
+          name: typeof item === 'string' ? item : `Attachment ${index}`,
+          url: typeof item === 'string' ? item : "#"
+        };
+      });
+    }
+    
+    // If it's a string (URL), create a single attachment
+    if (typeof attachmentsData === 'string') {
+      return [{
+        id: 'attachment-1',
+        type: 'file',
+        name: 'Attachment',
+        url: attachmentsData
+      }];
+    }
+    
+    // If it's an object but not in the correct format
+    if (typeof attachmentsData === 'object' && attachmentsData !== null) {
+      return Object.entries(attachmentsData).map(([key, value], index) => ({
+        id: `attachment-${index}`,
+        type: "file",
+        name: key,
+        url: typeof value === 'string' ? value : "#"
+      }));
+    }
+    
+    return [];
+  };
+
   const fetchMessages = async () => {
     try {
       setIsLoadingMessages(true);
@@ -206,7 +251,7 @@ export function ChatLayout({
                       status: "offline"
                     },
                 reactions: [],
-                attachments: message.attachments || [],
+                attachments: parseAttachments(message.attachments),
                 isEvent: message.is_event || false,
                 eventDetails: message.event_details,
               };
@@ -280,6 +325,7 @@ export function ChatLayout({
           <MessageList 
             messages={messages} 
             channelName={activeChannel.name}
+            isLoading={isLoadingMessages}
           />
         </div>
         <MessageInput 
@@ -291,4 +337,4 @@ export function ChatLayout({
   );
 }
 
-export default ChatLayout;
+export { ChatLayout as default };

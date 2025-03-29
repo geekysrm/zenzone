@@ -1,7 +1,6 @@
-
 import { Message } from "@/types/chat";
 import { formatRelativeTime } from "@/lib/dateUtils";
-import { Headphones, Paperclip } from "lucide-react";
+import { Headphones, Paperclip, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { getInitials } from "@/utils/avatarUtils";
@@ -9,10 +8,20 @@ import { getInitials } from "@/utils/avatarUtils";
 interface MessageListProps {
   messages: Message[];
   channelName: string;
+  isLoading?: boolean;
 }
 
-export default function MessageList({ messages, channelName }: MessageListProps) {
+export default function MessageList({ messages, channelName, isLoading = false }: MessageListProps) {
   const { user } = useAuth();
+  
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+        <p className="text-gray-500 mt-2">Loading messages...</p>
+      </div>
+    );
+  }
   
   if (messages.length === 0) {
     return (

@@ -20,6 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
+import { summarizeMessages } from "@/utils/summaryUtils";
 
 interface SidebarProps {
   sections: Section[];
@@ -74,14 +75,25 @@ export default function Sidebar({
   const handleSummarizeChannel = (e: React.MouseEvent, channel: Channel) => {
     e.stopPropagation(); // Prevent triggering channel selection
     
-    // Here you can add logic to handle summarization for the specific channel
-    console.log(`Summarize unread messages for ${channel.name}`);
+    // Don't do anything if there are no unread messages
+    if (!channel.unreadCount || channel.unreadCount === 0) {
+      toast({
+        title: "No unread messages",
+        description: `There are no unread messages in #${channel.name} to summarize.`,
+        duration: 3000,
+      });
+      return;
+    }
     
-    // Show a toast notification (this is just a placeholder)
+    // Show a loading toast
     toast({
-      title: "Summarizing Messages",
-      description: `Creating a summary for #${channel.name}...`,
+      title: "Summarizing Unread Messages",
+      description: `Creating a summary for ${channel.unreadCount} unread messages in #${channel.name}...`,
+      duration: 2000,
     });
+    
+    // Call the summarize function with the channel info
+    summarizeMessages([], channel.name, channel.id, channel.unreadCount);
   };
 
   return (

@@ -9,20 +9,27 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface MessageSummaryProps {
   messages: MessageForSummary[];
   channelName: string;
+  channelId?: string;
+  unreadCount?: number;
 }
 
-export default function MessageSummary({ messages, channelName }: MessageSummaryProps) {
+export default function MessageSummary({ 
+  messages, 
+  channelName,
+  channelId,
+  unreadCount = 0
+}: MessageSummaryProps) {
   const [summary, setSummary] = useState<React.ReactNode | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   
-  const hasMessages = messages.length > 0;
+  const hasMessages = messages.length > 0 || (unreadCount && unreadCount > 0);
   
   // Reset summary state when messages or channel changes
   useEffect(() => {
     setSummary(null);
     setIsGenerating(false);
-  }, [messages, channelName]);
+  }, [messages, channelName, channelId, unreadCount]);
   
   // Generate summary when dialog is opened
   const handleOpenChange = (open: boolean) => {
@@ -31,7 +38,7 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
     // If opening the dialog and we have messages, generate summary
     if (open && hasMessages && !summary) {
       setIsGenerating(true);
-      const summaryUI = summarizeMessages(messages, channelName);
+      const summaryUI = summarizeMessages(messages, channelName, channelId, unreadCount);
       setSummary(summaryUI);
     }
   };
@@ -50,7 +57,7 @@ export default function MessageSummary({ messages, channelName }: MessageSummary
       </DialogTrigger>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Channel Summary for #{channelName}</DialogTitle>
+          <DialogTitle>Unread Messages Summary for #{channelName}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 py-4">

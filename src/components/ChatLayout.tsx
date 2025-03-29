@@ -318,7 +318,9 @@ export default function ChatLayout({
           <div className="mr-4 flex items-center">
             <MessageSummary 
               messages={messagesForSummary} 
-              channelName={activeChannel.name} 
+              channelName={activeChannel.name}
+              channelId={activeChannel.id}
+              unreadCount={activeChannel.unreadCount}
             />
           </div>
         </div>

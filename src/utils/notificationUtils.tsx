@@ -18,6 +18,9 @@ export const NotificationHandler = ({ children }: { children: React.ReactNode })
     window.notificationState = {
       isDnd
     };
+    
+    // Also store in localStorage as a fallback
+    localStorage.setItem("notification_mode", isDnd ? "dnd" : "available");
   }, [isDnd]);
   
   return <>{children}</>;
@@ -37,7 +40,7 @@ export function showMessageNotification({
   channelId?: string;
 }) {
   try {
-    // Check if DND mode is enabled via the window object or localStorage
+    // First try to get DND state from window object
     // @ts-ignore - accessing custom property on window
     const isDnd = window.notificationState?.isDnd;
     
@@ -47,6 +50,14 @@ export function showMessageNotification({
     
     // Use the context value if available, otherwise use the fallback
     const shouldSuppressNotification = isDnd !== undefined ? isDnd : fallbackIsDnd;
+    
+    // Debug log
+    console.log("Notification state check:", { 
+      fromContext: isDnd, 
+      fromLocalStorage: fallbackIsDnd,
+      finalDecision: shouldSuppressNotification,
+      message: `${senderName} in #${channelName}: ${messageContent}`
+    });
     
     // If in DND mode, don't show any notifications
     if (shouldSuppressNotification) {
@@ -69,6 +80,8 @@ export function showMessageNotification({
       ),
       duration: 5000,
     });
+    
+    console.log("Notification displayed for:", { channelName, senderName, messageContent });
   } catch (error) {
     console.error('Error showing notification:', error);
   }

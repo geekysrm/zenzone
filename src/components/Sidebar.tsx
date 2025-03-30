@@ -1,9 +1,9 @@
-
 import { Channel, Section } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
-import { ChevronDown, Hash, Lock, LogOut, Plus, User, Sparkles } from "lucide-react";
+import { ChevronDown, Hash, Lock, LogOut, Plus, User, Sparkles, BellOff, Bell } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useNotification } from "@/context/NotificationContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +24,7 @@ import { MessageForSummary } from "@/utils/summaryUtils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { summarizeMessages } from "@/utils/summaryUtils";
+import { Switch } from "@/components/ui/switch";
 
 interface SidebarProps {
   sections: Section[];
@@ -41,6 +42,7 @@ export default function Sidebar({
   onChannelSelect,
 }: SidebarProps) {
   const { user, signOut } = useAuth();
+  const { mode, toggleMode, isDnd } = useNotification();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   
   // Add summary dialog state
@@ -192,6 +194,40 @@ export default function Sidebar({
         </div>
 
         <div className="p-3 mt-auto border-t border-slack-divider">
+          {/* Add notification toggle before the dropdown */}
+          <div className="flex items-center justify-between mb-3 px-2 py-1 rounded hover:bg-gray-800">
+            <div className="flex items-center">
+              {isDnd ? (
+                <BellOff className="h-5 w-5 text-red-400 mr-2" />
+              ) : (
+                <Bell className="h-5 w-5 text-green-400 mr-2" />
+              )}
+              <span className="text-sm">Notifications</span>
+            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Switch 
+                    checked={!isDnd} 
+                    onCheckedChange={() => {
+                      toggleMode();
+                      toast({
+                        title: isDnd ? "Notifications enabled" : "Do Not Disturb enabled",
+                        description: isDnd 
+                          ? "You will now receive message notifications" 
+                          : "You will not receive message notifications",
+                        duration: 3000,
+                      });
+                    }} 
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p>{isDnd ? "Enable notifications" : "Enable Do Not Disturb"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          
           <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center space-x-2 w-full hover:bg-gray-800 p-2 rounded cursor-pointer">

@@ -224,24 +224,24 @@ const Home = () => {
               <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                 <Shield className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle>Secure Communication</CardTitle>
+              <CardTitle>Notifications Summary</CardTitle>
               <CardDescription>
-                Your data is protected with enterprise-grade security and end-to-end encryption.
+                You don't have to skip a heartbeat when you get a new notification.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">End-to-end encryption</span>
+                  <span className="text-sm">Summarize notification with Claude</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">GDPR compliant</span>
+                  <span className="text-sm">Play summary audio with ElevenLabs</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Regular security audits</span>
+                  <span className="text-sm">Maintain your calm</span>
                 </li>
               </ul>
             </CardContent>

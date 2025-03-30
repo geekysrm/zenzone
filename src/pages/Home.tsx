@@ -129,7 +129,7 @@ const Home = () => {
         <div className="md:w-1/2">
           <div className="rounded-lg shadow-xl overflow-hidden border border-gray-200">
             <img 
-              src="/screenshot.jpg" 
+              src="/screenshot.png" 
               alt="ZenZone Chat Application" 
               className="w-full h-auto"
             />

@@ -9,9 +9,7 @@ import {
   Shield,
   Zap,
   Globe,
-  PanelTop,
   BellRing,
-  Clock,
   CheckCircle2
 } from "lucide-react";
 import {

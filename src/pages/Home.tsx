@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -129,42 +128,12 @@ const Home = () => {
         </div>
         
         <div className="md:w-1/2">
-          <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200">
-            <div className="bg-gray-100 p-2 flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <div className="text-xs text-gray-500 ml-2">ZenZone</div>
-            </div>
-            <div className="p-4 bg-gray-50">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">JD</div>
-                <div>
-                  <div className="text-sm font-semibold">John Doe</div>
-                  <div className="text-xs text-gray-500">Online</div>
-                </div>
-              </div>
-              <div className="mb-4">
-                <div className="bg-gray-200 rounded-lg p-3 text-sm max-w-xs">
-                  Hey team, any updates on the project deadline?
-                </div>
-                <div className="text-xs text-gray-500 mt-1">10:25 AM</div>
-              </div>
-              <div className="mb-4 flex justify-end">
-                <div>
-                  <div className="bg-primary text-white rounded-lg p-3 text-sm max-w-xs">
-                    Yes, we're on track to deliver by Friday!
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1 text-right">10:27 AM</div>
-                </div>
-              </div>
-              <div className="mb-4">
-                <div className="bg-gray-200 rounded-lg p-3 text-sm max-w-xs">
-                  Great news! Let's review tomorrow.
-                </div>
-                <div className="text-xs text-gray-500 mt-1">10:30 AM</div>
-              </div>
-            </div>
+          <div className="rounded-lg shadow-xl overflow-hidden border border-gray-200">
+            <img 
+              src="/screenshot.jpg" 
+              alt="ZenZone Chat Application" 
+              className="w-full h-auto"
+            />
           </div>
         </div>
       </section>
@@ -625,47 +594,4 @@ const Home = () => {
             
             <div>
               <h3 className="font-semibold text-lg mb-4">Product</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Security</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Integrations</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-4">Resources</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Guides</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Webinars</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Press</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400">© 2025 ZenZone. All rights reserved.</p>
-            <div className="flex gap-8 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Cookie Policy</a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-};
-
-export default Home;
+              <ul className="

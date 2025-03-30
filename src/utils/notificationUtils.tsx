@@ -1,16 +1,27 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
 // Import the notification context
 import { useNotification } from '@/context/NotificationContext';
 
-// Create a component that wraps the toast functionality and respects DND mode
-export function NotificationHandler() {
-  // This component doesn't render anything
-  return null;
-}
+// Create a global notification handler component that can be used to show notifications
+// based on the current notification mode
+export const NotificationHandler = ({ children }: { children: React.ReactNode }) => {
+  // We use the useNotification hook to access the notification context
+  const { isDnd } = useNotification();
+  
+  // Expose the notification state to the window object so it can be accessed from outside React components
+  useEffect(() => {
+    // @ts-ignore - adding a custom property to window
+    window.notificationState = {
+      isDnd
+    };
+  }, [isDnd]);
+  
+  return <>{children}</>;
+};
 
 export function showMessageNotification({
   channelName,
@@ -26,13 +37,19 @@ export function showMessageNotification({
   channelId?: string;
 }) {
   try {
-    // Check if DND mode is enabled via localStorage
-    // We need to check directly as we can't use hooks in a regular function
-    const notificationMode = localStorage.getItem("notification_mode");
-    const isDnd = notificationMode === "dnd";
+    // Check if DND mode is enabled via the window object or localStorage
+    // @ts-ignore - accessing custom property on window
+    const isDnd = window.notificationState?.isDnd;
+    
+    // If it's not available from the context (which it might not be outside of React components),
+    // fall back to localStorage
+    const fallbackIsDnd = localStorage.getItem("notification_mode") === "dnd";
+    
+    // Use the context value if available, otherwise use the fallback
+    const shouldSuppressNotification = isDnd !== undefined ? isDnd : fallbackIsDnd;
     
     // If in DND mode, don't show any notifications
-    if (isDnd) {
+    if (shouldSuppressNotification) {
       console.log("Notification suppressed (DND mode active):", { channelName, senderName, messageContent });
       return;
     }
